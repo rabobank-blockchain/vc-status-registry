@@ -45,7 +45,7 @@
   "dependencies": {
     "@types/web3": "^1.0.19",
     "ethereumjs-tx": "^1.3.7",
-    "web3": "^1.2.1"
+    "web3": "^1.2.2"
   },
   "devDependencies": {
     "@stryker-mutator/core": "^1.0.0",
