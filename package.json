@@ -1,6 +1,6 @@
 {
   "name": "vc-status-registry",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Interact with a registry for credential statuses on Ethereum",
   "engines": {
     "node": ">=8.15.0",
