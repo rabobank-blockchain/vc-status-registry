@@ -212,9 +212,9 @@ describe('Test vcStatusRegistry functionality', () => {
     const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
     const transactionCount = new TransactionCount(wallet)
 
-    // sinon
-    //   .stub(transactionCount as any, '_getTransactionCount')
-    //  .returns(Promise.resolve(31415))
+    sinon
+       .stub(transactionCount as any, '_getTransactionCount')
+      .returns(Promise.resolve(0))
 
     const count1 = await transactionCount.transactionCount()
     const count2 = await transactionCount.transactionCount()
