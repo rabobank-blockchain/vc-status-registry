@@ -1,27 +1,21 @@
-import Web3 = require('web3');
+import { ethers, providers, Contract, Wallet } from 'ethers';
 /**
  * Override Ethereum gas options
  */
 declare interface VcStatusRegistryOptions {
-    gasMultiplier?: number;
     gasLimit?: number;
-    gasPriceMax?: number;
-}
-declare interface Account {
-    address?: string;
-    privateKey?: string;
-    publicKey?: string;
+    gasPrice?: number;
+    txNonceMaxRaceCount?: number;
+    txNonceMaxIdleTime?: number;
 }
 export declare class VcStatusRegistry {
-    private readonly _web3;
     private readonly _ethereumProvider;
     private readonly _contractAddress;
-    private readonly _ABI;
+    private _provider;
+    private readonly _wallet;
     private readonly _contract;
-    private readonly _account;
-    private readonly _gasMultiplier;
     private readonly _gasLimit;
-    private readonly _gasPriceMax;
+    private readonly _gasPrice;
     private _transactionCount;
     /**
      * @constructor Will set up the connection to an ethereum provider with provided credentials.
@@ -30,16 +24,18 @@ export declare class VcStatusRegistry {
      * @param privateKey optional, private key for issuing credentials
      * @param options optional, see VcStatusRegistryOptions
      */
-    constructor(ethereumProvider: string, contractAddress: string, privateKey?: string, options?: VcStatusRegistryOptions);
+    constructor(_ethereumProvider: string, _contractAddress: string, privateKey?: string, options?: VcStatusRegistryOptions);
+    readonly contract: Contract;
     readonly ethereumProvider: string;
     readonly contractAddress: string;
-    readonly web3: Web3;
-    readonly account: Account;
+    readonly provider: providers.JsonRpcProvider;
+    readonly wallet: Wallet | undefined;
     setVcStatus: (credentialId: string) => Promise<string>;
     removeVcStatus: (credentialId: string) => Promise<string>;
     getVcStatus: (issuer: string, credentialId: string) => Promise<string>;
-    private pickDefault;
-    private sendSignedTransaction;
-    _sendSignedTransaction: (serializedTx: string) => Promise<string>;
+    private _sendSignedTransaction;
+    _contractMethod: (method: string, parameters: any[], overrides: object) => Promise<ethers.providers.TransactionResponse>;
+    subscribeEvents(f: any): void;
 }
+export { Wallet };
 export default VcStatusRegistry;

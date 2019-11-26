@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import Web3 = require('web3')
-import EthTx = require('ethereumjs-tx')
-import Contract from 'web3/eth/contract'
+import { ethers, providers, Contract, Wallet } from 'ethers'
 
 /**
  * Override Ethereum gas options
  */
 declare interface VcStatusRegistryOptions {
-  gasMultiplier?: number
   gasLimit?: number
-  gasPriceMax?: number
+  gasPrice?: number
+  txNonceMaxRaceCount?: number
+  txNonceMaxIdleTime?: number
 }
 
 declare interface Account {
@@ -33,10 +32,7 @@ declare interface Account {
   publicKey?: string
 }
 
-const DEFAULT_GAS_MULTIPLIER = 100000
-const DEFAULT_GAS_PRICE_MAX = 100000000000
-const DEFAULT_GAS_LIMIT = 300000
-const DEFAULT_ABI = [
+const ABI = [
   {
     'constant': false,
     'inputs': [
@@ -125,15 +121,11 @@ const DEFAULT_ABI = [
 ]
 
 export class VcStatusRegistry {
-  private readonly _web3: Web3
-  private readonly _ethereumProvider: string
-  private readonly _contractAddress: string
-  private readonly _ABI: any[]
+  private _provider: providers.JsonRpcProvider
+  private readonly _wallet: Wallet | undefined
   private readonly _contract: Contract
-  private readonly _account: Account
-  private readonly _gasMultiplier: number
-  private readonly _gasLimit: number
-  private readonly _gasPriceMax: number
+  private readonly _gasLimit: number | undefined
+  private readonly _gasPrice: number | undefined
   private _transactionCount: TransactionCount | undefined
 
   /**
@@ -144,29 +136,21 @@ export class VcStatusRegistry {
    * @param options optional, see VcStatusRegistryOptions
    */
   constructor (
-    ethereumProvider: string,
-    contractAddress: string,
+    private readonly _ethereumProvider: string,
+    private readonly _contractAddress: string,
     privateKey?: string,
     options: VcStatusRegistryOptions = {}
   ) {
-    this._ethereumProvider = ethereumProvider
-    this._contractAddress = contractAddress
-
-    this._web3 = new Web3(Web3.givenProvider || this._ethereumProvider)
-
-    this._account = {}
+    this._gasLimit = options.gasLimit
+    this._gasPrice = options.gasPrice
+    this._provider = new ethers.providers.JsonRpcProvider(this._ethereumProvider)
+    this._contract = new ethers.Contract(this._contractAddress, ABI, this._provider)
 
     if (privateKey) {
-      this._account = this._web3.eth.accounts.privateKeyToAccount('0x' + privateKey)
-      this._transactionCount = new TransactionCount(this._web3, this._account.address as string)
+      this._wallet = new ethers.Wallet(Buffer.from(privateKey, 'hex'), this._provider)
+      this._transactionCount = new TransactionCount(this._wallet, options)
+      this._contract = this._contract.connect(this._wallet)
     }
-
-    this._gasMultiplier = this.pickDefault(options.gasMultiplier, DEFAULT_GAS_MULTIPLIER)
-    this._gasLimit = this.pickDefault(options.gasLimit, DEFAULT_GAS_LIMIT)
-    this._gasPriceMax = this.pickDefault(options.gasPriceMax, DEFAULT_GAS_PRICE_MAX)
-    this._ABI = DEFAULT_ABI
-
-    this._contract = new this._web3.eth.Contract(this._ABI, this._contractAddress)
   }
 
   get ethereumProvider (): string {
@@ -177,74 +161,49 @@ export class VcStatusRegistry {
     return this._contractAddress
   }
 
-  get web3 (): Web3 {
-    return this._web3
+  get provider (): providers.JsonRpcProvider {
+    return this._provider
   }
 
-  get account (): Account {
-    return this._account
+  get wallet (): Wallet | undefined {
+    return this._wallet
   }
 
-  public setVcStatus = (credentialId: string): Promise<string> => {
-    return this.sendSignedTransaction('setVcStatus', [credentialId])
+  public setVcStatus = async (credentialId: string): Promise<string> => {
+    const txResponse = await this._sendSignedTransaction('setVcStatus',[ credentialId ])
+    return txResponse.hash as string
   }
 
-  public removeVcStatus = (credentialId: string): Promise<string> => {
-    return this.sendSignedTransaction('removeVcStatus', [credentialId])
+  public removeVcStatus = async (credentialId: string): Promise<string> => {
+    const txResponse = await this._sendSignedTransaction('removeVcStatus', [credentialId])
+    return txResponse.hash as string
   }
 
-  public getVcStatus = (issuer: string, credentialId: string): Promise<string> => {
-    return this._contract.methods.getVcStatus(issuer, credentialId).call()
+  public getVcStatus = async (issuer: string, credentialId: string): Promise<string> => {
+    return this._contract.getVcStatus(issuer, credentialId)
   }
 
-  private pickDefault = function (obj1: any, obj2: any): any {
-    return (typeof (obj1) === 'undefined') ? obj2 : obj1
-  }
-
-  private sendSignedTransaction = async (method: string, parameters: any[]): Promise<string> => {
-    if (!this._account.privateKey) {
-      throw(new Error(`Error: Can not call "${method}" without privateKey`))
+  private _sendSignedTransaction = async (method: string, parameters: any[]): Promise<ethers.providers.TransactionResponse> => {
+    if (!this._wallet) {
+      throw (new Error(`Error: Can not call "${method}" without privateKey`))
     }
-    const contractMethod = this._contract.methods[method](...parameters)
-    const data = contractMethod.encodeABI()
-    const [gas, nonce] = await Promise.all([
-      contractMethod.estimateGas(),
-      (this._transactionCount as TransactionCount).transactionCount()
-    ])
-    const rawTx = {
-      nonce: this._web3.utils.toHex(nonce),
-      gasPrice: this._web3.utils.toHex(Math.min(gas * this._gasMultiplier, this._gasPriceMax)),
-      gasLimit: this._web3.utils.toHex(this._gasLimit),
-      to: this._contractAddress,
-      value: '0x00',
-      data
+    const nonce = await (this._transactionCount as TransactionCount).transactionCount()
+    const overrides = {
+      nonce: nonce,
+      gasPrice: this._gasPrice,
+      gasLimit: this._gasLimit,
+      value: '0x00'
     }
-    const ethTx = new EthTx(rawTx)
-    const privateKey = this._account.privateKey
-    ethTx.sign(Buffer.from(privateKey.slice(2), 'hex'))
-    const serializedTx = ethTx.serialize()
-    return this._sendSignedTransaction('0x' + serializedTx.toString('hex'))
+    return this._contractMethod(method, parameters, overrides)
   }
 
-  // Wrap this function, so it can be stubbed using sinon
-  public _sendSignedTransaction = (serializedTx: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      this._web3.eth.sendSignedTransaction(serializedTx)
-        .once('transactionHash', txHash => {
-          resolve(txHash)
-        })
-        .once('error', error => {
-          reject(error)
-        })
-    })
+  // Isolate external function for sinon stub
+  public _contractMethod = async (method: string, parameters: any[], overrides: object): Promise<ethers.providers.TransactionResponse> => {
+    return this._contract[method](...parameters, overrides)
   }
-
 }
 
 class TransactionCount {
-  private readonly _web3: Web3
-  private readonly _address: string
-
   /**
    * currentTransaction holds the last transactionCount
    * Race conditions might occur. try to manage:
@@ -257,17 +216,14 @@ class TransactionCount {
   private _raceCount = 0
   private _lastTxTime = 0
 
-  constructor (web3: Web3, address: string) {
-    this._web3 = web3
-    this._address = address
-  }
+  constructor (private readonly _wallet: Wallet, private readonly _options: VcStatusRegistryOptions = {}) {}
 
   public transactionCount = async (): Promise<number> => {
-    const maxRaceCount = 100
-    const maxIdleTime = 30 * 1000 // Make sure to skip at least 1 block
+    const maxRaceCount = this._options.txNonceMaxRaceCount || 100
+    const maxIdleTime = this._options.txNonceMaxIdleTime || 30000 // Make sure to skip at least 1 block
 
     const now = new Date().valueOf() // Time in miliseconds since 1970
-    const nonce = await this._web3.eth.getTransactionCount(this._address)
+    const nonce = await this._wallet.getTransactionCount()
 
     if (
       (nonce > this._currentTransaction) ||
@@ -288,4 +244,5 @@ class TransactionCount {
   }
 }
 
+export { Wallet }
 export default VcStatusRegistry

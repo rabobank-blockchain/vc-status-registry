@@ -18,7 +18,8 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as chaiAsPromised from 'chai-as-promised'
 import * as sinonChai from 'sinon-chai'
-import VcStatusRegistry from '../src/vc-status-registry'
+import { VcStatusRegistry, Wallet } from '../src/vc-status-registry'
+import { TransactionResponse } from 'ethers/providers'
 
 const assert = chai.assert
 
@@ -87,7 +88,7 @@ describe('Test vcStatusRegistry functionality', () => {
     }
 
     // Assert
-    assert.isRejected(wrapper(), 'Invalid JSON RPC response: ""')
+    assert.isRejected(wrapper(), 'Cannot read property \'getVcStatus\' of undefined')
   })
 
   it('should not add a value to the registry if not initialized with privateKey', async () => {
@@ -120,14 +121,14 @@ describe('Test vcStatusRegistry functionality', () => {
     privateKey
   )
 
-  it('should return account', async () => {
-    const result = vcStatusRegistry.account
+  it('should return wallet', async () => {
+    const result = vcStatusRegistry.wallet as Wallet
     assert.deepEqual(result.address, '0xac9E10ab57f6DcDad1bA0C634EdCAE25116F5dab')
     assert.deepEqual(result.privateKey, '0x' + privateKey)
   })
 
-  it('should return web3', async () => {
-    const result = vcStatusRegistry.web3
+  it('should return provider', async () => {
+    const result = vcStatusRegistry.provider
     assert.isObject(result)
   })
 
@@ -136,38 +137,66 @@ describe('Test vcStatusRegistry functionality', () => {
     assert.deepEqual(result, provider)
   })
 
-  it('should return contractAddress', async () => {
+  it('should return contractAddress', () => {
     const result = vcStatusRegistry.contractAddress
     assert.deepEqual(result, contractAddress)
   })
 
   it('should succesfully getVcStatus function()', async () => {
+    const stubGetVcStatus = sinon
+      .stub(vcStatusRegistry, 'getVcStatus')
+      .returns(Promise.resolve('true'))
+
     const result = await vcStatusRegistry.getVcStatus(issuer, credentialId3)
 
     // Assert
-    assert.isFalse(Boolean(result))
+    assert.isTrue(stubGetVcStatus.calledOnce)
+    assert.isTrue(Boolean(result))
   })
 
   it('should add values to the registry', async () => {
-    const stubSendSignedTransaction = sinon.stub(vcStatusRegistry, '_sendSignedTransaction')
+    const stubContractMethod = sinon
+      .stub(vcStatusRegistry, '_contractMethod')
+      .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
 
     // Call it twice so 'racing' is also tested
-    await Promise.all([
+    const res = await Promise.all([
       vcStatusRegistry.setVcStatus(credentialId1),
       vcStatusRegistry.setVcStatus(credentialId2)
     ])
 
     // Assert
-    assert.isTrue(stubSendSignedTransaction.calledTwice)
+    assert.isTrue(stubContractMethod.calledTwice)
+    assert.deepEqual(res, ['dude', 'dude'])
   })
 
   it('should remove a value from the registry', async () => {
-    const stubSendSignedTransaction = sinon.stub(vcStatusRegistry, '_sendSignedTransaction')
+    const stubContractMethod = sinon
+      .stub(vcStatusRegistry, '_contractMethod')
+      .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
 
     await vcStatusRegistry.removeVcStatus(credentialId3)
 
     // Assert
-    assert.isTrue(stubSendSignedTransaction.calledOnce)
+    assert.isTrue(stubContractMethod.calledOnce)
+  })
+
+  const vcStatusRegistryKeyless = new VcStatusRegistry(
+    provider,
+    contractAddress
+  )
+
+  it('should throw if setVcStatus is called without privateKey', async () => {
+    const stubContractMethod = sinon
+      .stub(vcStatusRegistry, '_contractMethod')
+      .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
+
+    const wrapper = async () => {
+      return vcStatusRegistryKeyless.setVcStatus(credentialId1)
+    }
+
+    // Assert
+    assert.isRejected(wrapper(), 'Error: Can not call "setVcStatus" without privateKey')
   })
 
 })
