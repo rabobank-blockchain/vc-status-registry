@@ -18,7 +18,7 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as chaiAsPromised from 'chai-as-promised'
 import * as sinonChai from 'sinon-chai'
-import { VcStatusRegistry, Wallet } from '../src/vc-status-registry'
+import { VcStatusRegistry, Wallet, TransactionCount } from '../src/vc-status-registry'
 import { TransactionResponse } from 'ethers/providers'
 
 const assert = chai.assert
@@ -156,8 +156,11 @@ describe('Test vcStatusRegistry functionality', () => {
 
   it('should add values to the registry', async () => {
     const stubContractMethod = sinon
-      .stub(vcStatusRegistry, '_contractMethod')
+      .stub(vcStatusRegistry as any, '_contractMethod')
       .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
+    sinon
+      .stub(vcStatusRegistry as any, '_getTransactionCount')
+      .returns(Promise.resolve(31415))
 
     // Call it twice so 'racing' is also tested
     const res = await Promise.all([
@@ -172,8 +175,11 @@ describe('Test vcStatusRegistry functionality', () => {
 
   it('should remove a value from the registry', async () => {
     const stubContractMethod = sinon
-      .stub(vcStatusRegistry, '_contractMethod')
+      .stub(vcStatusRegistry as any, '_contractMethod')
       .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
+    sinon
+      .stub(vcStatusRegistry as any, '_getTransactionCount')
+      .returns(Promise.resolve(31415))
 
     await vcStatusRegistry.removeVcStatus(credentialId3)
 
@@ -188,8 +194,11 @@ describe('Test vcStatusRegistry functionality', () => {
 
   it('should throw if setVcStatus is called without privateKey', async () => {
     const stubContractMethod = sinon
-      .stub(vcStatusRegistry, '_contractMethod')
+      .stub(vcStatusRegistry as any, '_contractMethod')
       .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
+    sinon
+      .stub(vcStatusRegistry as any, '_getTransactionCount')
+      .returns(Promise.resolve(31415))
 
     const wrapper = async () => {
       return vcStatusRegistryKeyless.setVcStatus(credentialId1)
@@ -199,4 +208,18 @@ describe('Test vcStatusRegistry functionality', () => {
     assert.isRejected(wrapper(), 'Error: Can not call "setVcStatus" without privateKey')
   })
 
+  it('should create and get a transaction count', async () => {
+    const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
+    const transactionCount = new TransactionCount(wallet)
+
+    // sinon
+    //   .stub(transactionCount as any, '_getTransactionCount')
+    //  .returns(Promise.resolve(31415))
+
+    const count1 = await transactionCount.transactionCount()
+    const count2 = await transactionCount.transactionCount()
+
+    assert.deepEqual(count1, 0)
+    assert.deepEqual(count2, 1)
+  })
 })

@@ -187,18 +187,22 @@ export class VcStatusRegistry {
     if (!this._wallet) {
       throw (new Error(`Error: Can not call "${method}" without privateKey`))
     }
-    const nonce = await (this._transactionCount as TransactionCount).transactionCount()
+    const nonce = await this._getTransactionCount()
     const overrides = {
       nonce: nonce,
       gasPrice: this._gasPrice,
-      gasLimit: this._gasLimit,
-      value: '0x00'
+      gasLimit: this._gasLimit
     }
     return this._contractMethod(method, parameters, overrides)
   }
 
   // Isolate external function for sinon stub
-  public _contractMethod = async (method: string, parameters: any[], overrides: object): Promise<ethers.providers.TransactionResponse> => {
+  private _getTransactionCount = async () => {
+    return (this._transactionCount as TransactionCount).transactionCount()
+  }
+
+  // Isolate external function for sinon stub
+  private _contractMethod = async (method: string, parameters: any[], overrides: object): Promise<ethers.providers.TransactionResponse> => {
     return this._contract[method](...parameters, overrides)
   }
 }
@@ -223,7 +227,7 @@ class TransactionCount {
     const maxIdleTime = this._options.txNonceMaxIdleTime || 30000 // Make sure to skip at least 1 block
 
     const now = new Date().valueOf() // Time in miliseconds since 1970
-    const nonce = await this._wallet.getTransactionCount()
+    const nonce = await this._getTransactionCount()
 
     if (
       (nonce > this._currentTransaction) ||
@@ -242,7 +246,12 @@ class TransactionCount {
       return ++this._currentTransaction
     }
   }
+
+  // Isolate external function for sinon stub
+  private _getTransactionCount = async () => {
+    return (this._wallet).getTransactionCount()
+  }
 }
 
-export { Wallet }
+export { Wallet, TransactionCount }
 export default VcStatusRegistry
