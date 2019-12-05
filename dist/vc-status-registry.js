@@ -15,16 +15,18 @@
  * limitations under the License.
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ethers_1 = require("ethers");
 exports.Wallet = ethers_1.Wallet;
+const rxjs_1 = require("rxjs");
 const ABI = [
     {
         'constant': false,
@@ -123,17 +125,15 @@ class VcStatusRegistry {
     constructor(_ethereumProvider, _contractAddress, privateKey, options = {}) {
         this._ethereumProvider = _ethereumProvider;
         this._contractAddress = _contractAddress;
+        this._onNewBlock = new rxjs_1.Subject();
+        this._onSetVcStatus = new rxjs_1.Subject();
+        this._onRemoveVcStatus = new rxjs_1.Subject();
+        this._onError = new rxjs_1.Subject();
         this.setVcStatus = (credentialId) => __awaiter(this, void 0, void 0, function* () {
-            if (!this._wallet) {
-                throw new Error('Error: Can not call "setVcStatus" without privateKey');
-            }
             const txResponse = yield this._sendSignedTransaction('setVcStatus', [credentialId]);
             return txResponse.hash;
         });
         this.removeVcStatus = (credentialId) => __awaiter(this, void 0, void 0, function* () {
-            if (!this._wallet) {
-                throw new Error('Error: Can not call "removeVcStatus" without privateKey');
-            }
             const txResponse = yield this._sendSignedTransaction('removeVcStatus', [credentialId]);
             return txResponse.hash;
         });
@@ -144,18 +144,25 @@ class VcStatusRegistry {
             if (!this._wallet) {
                 throw (new Error(`Error: Can not call "${method}" without privateKey`));
             }
-            const nonce = yield this._transactionCount.transactionCount();
+            const nonce = yield this._getTransactionCount();
             const overrides = {
                 nonce: nonce,
                 gasPrice: this._gasPrice,
-                gasLimit: this._gasLimit,
-                value: '0x00'
+                gasLimit: this._gasLimit
             };
             return this._contractMethod(method, parameters, overrides);
         });
         // Isolate external function for sinon stub
+        this._getTransactionCount = () => __awaiter(this, void 0, void 0, function* () {
+            return this._transactionCount.transactionCount();
+        });
+        // Isolate external function for sinon stub
         this._contractMethod = (method, parameters, overrides) => __awaiter(this, void 0, void 0, function* () {
             return this._contract[method](...parameters, overrides);
+        });
+        // Probably remove since they are convenience methods, should live in a separate class
+        this.getBlockNumber = () => __awaiter(this, void 0, void 0, function* () {
+            return this.provider.getBlockNumber();
         });
         this._gasLimit = options.gasLimit;
         this._gasPrice = options.gasPrice;
@@ -166,9 +173,7 @@ class VcStatusRegistry {
             this._transactionCount = new TransactionCount(this._wallet, options);
             this._contract = this._contract.connect(this._wallet);
         }
-    }
-    get contract() {
-        return this._contract;
+        this.initiateEventSubscriptions();
     }
     get ethereumProvider() {
         return this._ethereumProvider;
@@ -182,9 +187,51 @@ class VcStatusRegistry {
     get wallet() {
         return this._wallet;
     }
-    subscribeEvents(f) {
-        this._provider
-            .on(ethers_1.ethers.utils.id('VcStatusSet(address,address)'), f);
+    get onNewBlock() {
+        return this._onNewBlock;
+    }
+    get onSetVcStatus() {
+        return this._onSetVcStatus;
+    }
+    get onRemoveVcStatus() {
+        return this._onRemoveVcStatus;
+    }
+    get onError() {
+        return this._onError;
+    }
+    initiateEventSubscriptions() {
+        this.initiateStatusSetEventSubscriber();
+        this.initiateStatusRemovedEventSubscriber();
+        this.initiateErrorEventSubscriber();
+        this.initiateNewBlockEventSubscriber();
+    }
+    initiateStatusSetEventSubscriber() {
+        const statusSetFilter = {
+            address: this.contractAddress,
+            topics: [ethers_1.ethers.utils.id('VcStatusSet(address,address)')]
+        };
+        this.provider.on(statusSetFilter, (result) => {
+            this._onSetVcStatus.next(result);
+        });
+    }
+    initiateStatusRemovedEventSubscriber() {
+        const statusRemoveFilter = {
+            address: this.contractAddress,
+            topics: [ethers_1.ethers.utils.id('VcStatusRemoved(address,address)')]
+        };
+        this.provider.on(statusRemoveFilter, (result) => {
+            this._onRemoveVcStatus.next(result);
+        });
+    }
+    initiateErrorEventSubscriber() {
+        this.provider.on('error', (error) => {
+            this._onError.next(error);
+        });
+    }
+    initiateNewBlockEventSubscriber() {
+        this.provider.on('block', (blockNumber) => {
+            this._onNewBlock.next({ blockNumber });
+        });
     }
 }
 exports.VcStatusRegistry = VcStatusRegistry;
@@ -207,7 +254,7 @@ class TransactionCount {
             const maxRaceCount = this._options.txNonceMaxRaceCount || 100;
             const maxIdleTime = this._options.txNonceMaxIdleTime || 30000; // Make sure to skip at least 1 block
             const now = new Date().valueOf(); // Time in miliseconds since 1970
-            const nonce = yield this._wallet.getTransactionCount();
+            const nonce = yield this._getTransactionCount();
             if ((nonce > this._currentTransaction) ||
                 (this._raceCount > maxRaceCount) ||
                 ((now - this._lastTxTime) > maxIdleTime)) {
@@ -224,7 +271,12 @@ class TransactionCount {
                 return ++this._currentTransaction;
             }
         });
+        // Isolate external function for sinon stub
+        this._getTransactionCount = () => __awaiter(this, void 0, void 0, function* () {
+            return (this._wallet).getTransactionCount();
+        });
     }
 }
+exports.TransactionCount = TransactionCount;
 exports.default = VcStatusRegistry;
 //# sourceMappingURL=vc-status-registry.js.map

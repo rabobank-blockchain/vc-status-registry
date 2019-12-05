@@ -1,4 +1,5 @@
-import { ethers, providers, Contract, Wallet } from 'ethers';
+import { providers, Wallet } from 'ethers';
+import { Subject } from 'rxjs';
 /**
  * Override Ethereum gas options
  */
@@ -7,6 +8,20 @@ declare interface VcStatusRegistryOptions {
     gasPrice?: number;
     txNonceMaxRaceCount?: number;
     txNonceMaxIdleTime?: number;
+}
+export interface ContractEventData {
+    blockNumber: number;
+    blockHash: string;
+    transactionIndex: number;
+    removed: boolean;
+    address: string;
+    data: string;
+    topics: string[];
+    transactionHash: string;
+    logIndex: number;
+}
+export interface NewBlockData {
+    blockNumber: number;
 }
 export declare class VcStatusRegistry {
     private readonly _ethereumProvider;
@@ -17,6 +32,10 @@ export declare class VcStatusRegistry {
     private readonly _gasLimit;
     private readonly _gasPrice;
     private _transactionCount;
+    private _onNewBlock;
+    private _onSetVcStatus;
+    private _onRemoveVcStatus;
+    private _onError;
     /**
      * @constructor Will set up the connection to an ethereum provider with provided credentials.
      * @param ethereumProvider connection string
@@ -25,17 +44,44 @@ export declare class VcStatusRegistry {
      * @param options optional, see VcStatusRegistryOptions
      */
     constructor(_ethereumProvider: string, _contractAddress: string, privateKey?: string, options?: VcStatusRegistryOptions);
-    readonly contract: Contract;
-    readonly ethereumProvider: string;
-    readonly contractAddress: string;
-    readonly provider: providers.JsonRpcProvider;
-    readonly wallet: Wallet | undefined;
+    get ethereumProvider(): string;
+    get contractAddress(): string;
+    get provider(): providers.JsonRpcProvider;
+    get wallet(): Wallet | undefined;
+    get onNewBlock(): Subject<NewBlockData>;
+    get onSetVcStatus(): Subject<ContractEventData>;
+    get onRemoveVcStatus(): Subject<ContractEventData>;
+    get onError(): Subject<any>;
     setVcStatus: (credentialId: string) => Promise<string>;
     removeVcStatus: (credentialId: string) => Promise<string>;
     getVcStatus: (issuer: string, credentialId: string) => Promise<string>;
     private _sendSignedTransaction;
-    _contractMethod: (method: string, parameters: any[], overrides: object) => Promise<ethers.providers.TransactionResponse>;
-    subscribeEvents(f: any): void;
+    private _getTransactionCount;
+    private _contractMethod;
+    private initiateEventSubscriptions;
+    private initiateStatusSetEventSubscriber;
+    private initiateStatusRemovedEventSubscriber;
+    private initiateErrorEventSubscriber;
+    getBlockNumber: () => Promise<number>;
+    private initiateNewBlockEventSubscriber;
 }
-export { Wallet };
+declare class TransactionCount {
+    private readonly _wallet;
+    private readonly _options;
+    /**
+     * currentTransaction holds the last transactionCount
+     * Race conditions might occur. try to manage:
+     * - transactionNr missed. reset if raceCount > maxRaceCount
+     * - idle for some time. reset if lastTxTime > maxIdleTime
+     * In the future you might want to handle this completely different by keeping
+     * track of all open requests
+     */
+    private _currentTransaction;
+    private _raceCount;
+    private _lastTxTime;
+    constructor(_wallet: Wallet, _options?: VcStatusRegistryOptions);
+    transactionCount: () => Promise<number>;
+    private _getTransactionCount;
+}
+export { Wallet, TransactionCount };
 export default VcStatusRegistry;
