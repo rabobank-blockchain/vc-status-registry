@@ -15,6 +15,7 @@
  */
 
 import { ethers, providers, Contract, Wallet } from 'ethers'
+import { Subject } from 'rxjs'
 
 /**
  * Override Ethereum gas options
@@ -120,6 +121,22 @@ const ABI = [
   }
 ]
 
+export interface ContractEventData {
+  blockNumber: number
+  blockHash: string
+  transactionIndex: number
+  removed: boolean
+  address: string
+  data: string
+  topics: string[]
+  transactionHash: string
+  logIndex: number
+}
+
+export interface NewBlockData {
+  blockNumber: number
+}
+
 export class VcStatusRegistry {
   private _provider: providers.JsonRpcProvider
   private readonly _wallet: Wallet | undefined
@@ -127,6 +144,10 @@ export class VcStatusRegistry {
   private readonly _gasLimit: number | undefined
   private readonly _gasPrice: number | undefined
   private _transactionCount: TransactionCount | undefined
+  private _onNewBlock = new Subject<NewBlockData>()
+  private _onSetVcStatus = new Subject<ContractEventData>()
+  private _onRemoveVcStatus = new Subject<ContractEventData>()
+  private _onError = new Subject<any>()
 
   /**
    * @constructor Will set up the connection to an ethereum provider with provided credentials.
@@ -136,10 +157,10 @@ export class VcStatusRegistry {
    * @param options optional, see VcStatusRegistryOptions
    */
   constructor (
-    private readonly _ethereumProvider: string,
-    private readonly _contractAddress: string,
-    privateKey?: string,
-    options: VcStatusRegistryOptions = {}
+      private readonly _ethereumProvider: string,
+      private readonly _contractAddress: string,
+      privateKey?: string,
+      options: VcStatusRegistryOptions = {}
   ) {
     this._gasLimit = options.gasLimit
     this._gasPrice = options.gasPrice
@@ -151,6 +172,7 @@ export class VcStatusRegistry {
       this._transactionCount = new TransactionCount(this._wallet, options)
       this._contract = this._contract.connect(this._wallet)
     }
+    this.initiateEventSubscriptions()
   }
 
   get ethereumProvider (): string {
@@ -168,9 +190,20 @@ export class VcStatusRegistry {
   get wallet (): Wallet | undefined {
     return this._wallet
   }
-
+  get onNewBlock (): Subject<NewBlockData> {
+    return this._onNewBlock
+  }
+  get onSetVcStatus (): Subject<ContractEventData> {
+    return this._onSetVcStatus
+  }
+  get onRemoveVcStatus (): Subject<ContractEventData> {
+    return this._onRemoveVcStatus
+  }
+  get onError (): Subject<any> {
+    return this._onError
+  }
   public setVcStatus = async (credentialId: string): Promise<string> => {
-    const txResponse = await this._sendSignedTransaction('setVcStatus',[ credentialId ])
+    const txResponse = await this._sendSignedTransaction('setVcStatus', [credentialId])
     return txResponse.hash as string
   }
 
@@ -205,6 +238,53 @@ export class VcStatusRegistry {
   private _contractMethod = async (method: string, parameters: any[], overrides: object): Promise<ethers.providers.TransactionResponse> => {
     return this._contract[method](...parameters, overrides)
   }
+
+  private initiateEventSubscriptions () {
+    this.initiateStatusSetEventSubscriber()
+    this.initiateStatusRemovedEventSubscriber()
+    this.initiateErrorEventSubscriber()
+    this.initiateNewBlockEventSubscriber()
+  }
+
+  private initiateStatusSetEventSubscriber () {
+    const statusSetFilter = {
+      address: this.contractAddress,
+      topics: [ethers.utils.id('VcStatusSet(address,address)')]
+    }
+    this.provider.on(statusSetFilter, (result) => {
+      this._onSetVcStatus.next(result as ContractEventData)
+    })
+  }
+
+  private initiateStatusRemovedEventSubscriber () {
+
+    const statusRemoveFilter = {
+      address: this.contractAddress,
+      topics: [ethers.utils.id('VcStatusRemoved(address,address)')]
+    }
+
+    this.provider.on(statusRemoveFilter, (result) => {
+      this._onRemoveVcStatus.next(result as ContractEventData)
+    })
+  }
+
+  private initiateErrorEventSubscriber () {
+    this.provider.on('error', (error) => {
+      this._onError.next(error)
+    })
+  }
+
+  // Probably remove since they are convenience methods, should live in a separate class
+  public getBlockNumber = async (): Promise<number> => {
+    return this.provider.getBlockNumber()
+  }
+
+  private initiateNewBlockEventSubscriber () {
+    this.provider.on('block', (blockNumber) => {
+      this._onNewBlock.next({ blockNumber } as NewBlockData)
+    })
+  }
+
 }
 
 class TransactionCount {
