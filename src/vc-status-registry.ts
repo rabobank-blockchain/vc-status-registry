@@ -286,24 +286,24 @@ export class VcStatusRegistry {
     })
   }
 
-  public getPastStatusSetEvents (did: string, fromBlock = 0, toBlock = 'latest'): Promise<Array<ContractEventData>> {
+  public getPastStatusSetEvents (did: string, fromBlock = 0, toBlock = 'latest'): Promise<Array<Log>> {
     const filter = {
       address: this.contractAddress,
       fromBlock: fromBlock,
       toBlock: toBlock,
-      topics: [[ethers.utils.id(ethers.utils.id('VcStatusSet(address,address)')), ethers.utils.id(ethers.utils.id(did))]]
+      topics: [ethers.utils.id('VcStatusSet(address,address)'), ethers.utils.id(did)]
     }
-    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
+    return this.provider.getLogs(filter)
   }
 
-  public getPastStatusRemoveEvents (did: string, fromBlock = 0, toBlock = 'latest'): Promise<Array<ContractEventData>> {
+  public getPastStatusRemoveEvents (did: string, fromBlock = 0, toBlock = 'latest'): Promise<Array<Log>> {
     const filter = {
       address: this.contractAddress,
       fromBlock: fromBlock,
       toBlock: toBlock,
-      topics: [[ethers.utils.id(ethers.utils.id('VcStatusRemoved(address,address)')),ethers.utils.id(ethers.utils.id(did))]]
+      topics: [ethers.utils.id('VcStatusRemoved(address,address)'), ethers.utils.id(did)]
     }
-    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
+    return this.provider.getLogs(filter)
   }
 
 }
