@@ -19,7 +19,7 @@ import * as sinon from 'sinon'
 import * as chaiAsPromised from 'chai-as-promised'
 import * as sinonChai from 'sinon-chai'
 import { VcStatusRegistry, Wallet, TransactionCount, NewBlockData, ContractEventData } from '../src/vc-status-registry'
-import { JsonRpcProvider, TransactionResponse } from 'ethers/providers'
+import {JsonRpcProvider, Log, TransactionResponse} from 'ethers/providers'
 import { ethers } from 'ethers'
 
 const assert = chai.assert
@@ -300,6 +300,98 @@ describe('Test vcStatusRegistry functionality', () => {
     sinon.stub(vcStatusRegistry.provider, 'getBlockNumber').returns(Promise.resolve(54))
     const blockNumber = await vcStatusRegistry.getBlockNumber()
     assert.equal(blockNumber, 54)
+  })
+
+  it('return the past events for SetStatus event when asked with fromBlock and toBlock', async () => {
+    let sinonStub = sinon.stub(vcStatusRegistry.provider, 'getLogs')
+    sinonStub.returns(Promise.resolve([{
+      blockNumber: 1,
+      blockHash: 'hash',
+      transactionIndex: 1,
+      removed: false,
+      address: 'adress',
+      data: 'data',
+      topics: ['topic1', 'topic2'],
+      transactionHash: '2',
+      logIndex: 1
+    }]))
+    const pastEvents = await vcStatusRegistry.getPastStatusSetEvents('did', 1, 2)
+    assert.equal(pastEvents.length, 1)
+    assert.isTrue(sinonStub.calledWithExactly({
+      address: contractAddress,
+      fromBlock: 1,
+      toBlock: 2,
+      topics: [ethers.utils.id('VcStatusSet(address,address)'), [], 'did']
+    }))
+  })
+
+  it('return the past events for RemoveStatus event when asked with fromBlock and toBlock', async () => {
+    let sinonStub = sinon.stub(vcStatusRegistry.provider, 'getLogs')
+    sinonStub.returns(Promise.resolve([{
+      blockNumber: 1,
+      blockHash: 'hash',
+      transactionIndex: 1,
+      removed: false,
+      address: 'adress',
+      data: 'data',
+      topics: ['topic1', 'topic2'],
+      transactionHash: '2',
+      logIndex: 1
+    }]))
+    const pastEvents = await vcStatusRegistry.getPastStatusRemoveEvents('did', 1, 2)
+    assert.equal(pastEvents.length, 1)
+    assert.isTrue(sinonStub.calledWithExactly({
+      address: contractAddress,
+      fromBlock: 1,
+      toBlock: 2,
+      topics: [ethers.utils.id('VcStatusRemoved(address,address)'), [], 'did']
+    }))
+  })
+
+  it('return the past events for SetStatus event when asked with default fromBlock and toBlock', async () => {
+    let sinonStub = sinon.stub(vcStatusRegistry.provider, 'getLogs')
+    sinonStub.returns(Promise.resolve([{
+      blockNumber: 1,
+      blockHash: 'hash',
+      transactionIndex: 1,
+      removed: false,
+      address: 'adress',
+      data: 'data',
+      topics: ['topic1', 'topic2'],
+      transactionHash: '2',
+      logIndex: 1
+    }]))
+    const pastEvents = await vcStatusRegistry.getPastStatusSetEvents('did')
+    assert.equal(pastEvents.length, 1)
+    assert.isTrue(sinonStub.calledWithExactly({
+      address: contractAddress,
+      fromBlock: 0,
+      toBlock: 'latest',
+      topics: [ethers.utils.id('VcStatusSet(address,address)'), [], 'did']
+    }))
+  })
+
+  it('return the past events for RemovedStatus event when asked with default fromBlock and toBlock', async () => {
+    let sinonStub = sinon.stub(vcStatusRegistry.provider, 'getLogs')
+    sinonStub.returns(Promise.resolve([{
+      blockNumber: 1,
+      blockHash: 'hash',
+      transactionIndex: 1,
+      removed: false,
+      address: 'adress',
+      data: 'data',
+      topics: ['topic1', 'topic2'],
+      transactionHash: '2',
+      logIndex: 1
+    }]))
+    const pastEvents = await vcStatusRegistry.getPastStatusRemoveEvents('did')
+    assert.equal(pastEvents.length, 1)
+    assert.isTrue(sinonStub.calledWithExactly({
+      address: contractAddress,
+      fromBlock: 0,
+      toBlock: 'latest',
+      topics: [ethers.utils.id('VcStatusRemoved(address,address)'), [], 'did']
+    }))
   })
 
 })
