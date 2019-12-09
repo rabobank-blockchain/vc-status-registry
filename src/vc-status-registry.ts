@@ -291,7 +291,7 @@ export class VcStatusRegistry {
       address: this.contractAddress,
       fromBlock: fromBlock,
       toBlock: toBlock,
-      topics: [ethers.utils.id('VcStatusSet(address,address)'), ethers.utils.id(did)]
+      topics: [ethers.utils.id('VcStatusSet(address,address)'), did]
     }
     return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
   }
@@ -301,7 +301,7 @@ export class VcStatusRegistry {
       address: this.contractAddress,
       fromBlock: fromBlock,
       toBlock: toBlock,
-      topics: [ethers.utils.id('VcStatusRemoved(address,address)'), ethers.utils.id(did)]
+      topics: [ethers.utils.id('VcStatusRemoved(address,address)'), did]
     }
     return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
   }
