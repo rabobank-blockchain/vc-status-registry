@@ -18,7 +18,8 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as chaiAsPromised from 'chai-as-promised'
 import * as sinonChai from 'sinon-chai'
-import { VcStatusRegistry, TransactionCount, Wallet } from '../src/vc-status-registry'
+import { VcStatusRegistry, Wallet, TransactionCount, NewBlockData, ContractEventData } from '../src/vc-status-registry'
+import { ethers } from 'ethers'
 
 const assert = chai.assert
 
@@ -413,4 +414,84 @@ describe('Test vcStatusRegistry functionality', () => {
     // Act
     assert.deepEqual(vcStatusRegistry.ABI, ABI)
   })
+
+  it('should forward the event when SetVcStatus happens on the contract', async () => {
+    const providerData = {
+      blockNumber: 12,
+      blockHash: 'someHash',
+      transactionIndex: 12,
+      removed: true,
+      address: '0xasd',
+      data: 'SomeDataHere',
+      topics: ['0xa', '0xb'],
+      transactionHash: 'hashControl',
+      logIndex: 54
+    }
+    const statusSetFilter = {
+      address: contractAddress,
+      topics: [ethers.utils.id('VcStatusSet(address,address)')]
+    }
+    let returnData: ContractEventData
+    vcStatusRegistry.onSetVcStatus.subscribe(async (e: ContractEventData) => {
+      returnData = e
+    })
+    vcStatusRegistry.provider.emit(statusSetFilter, providerData)
+    setTimeout(() => {
+      assert.deepEqual(returnData, providerData)
+    },1)
+  })
+  it('should forward the event when RemoveVcStatus happens on the contract', async () => {
+    const providerData = {
+      blockNumber: 12,
+      blockHash: 'someHash',
+      transactionIndex: 12,
+      removed: true,
+      address: '0xasd',
+      data: 'HelloDataHere',
+      topics: ['0xa', '0xb'],
+      transactionHash: 'hashControl',
+      logIndex: 54
+    }
+    const statusSetFilter = {
+      address: contractAddress,
+      topics: [ethers.utils.id('VcStatusRemoved(address,address)')]
+    }
+    let returnData: ContractEventData
+    vcStatusRegistry.onRemoveVcStatus.subscribe(async (e: ContractEventData) => {
+      returnData = e
+    })
+    vcStatusRegistry.provider.emit(statusSetFilter, providerData)
+    setTimeout(() => {
+      assert.deepEqual(returnData, providerData)
+    },1)
+  })
+
+  it('should forward the event when newBlock happens on the blockchain', async () => {
+    let returnData: NewBlockData
+    vcStatusRegistry.onNewBlock.subscribe(async (e: NewBlockData) => {
+      returnData = e
+    })
+    vcStatusRegistry.provider.emit('block', 12)
+    setTimeout(() => {
+      assert.deepEqual(returnData, { blockNumber: 12 })
+    },1)
+  })
+
+  it('should forward the error when it happens on the blockchain', async () => {
+    let returnData: any
+    vcStatusRegistry.onError.subscribe(async (e: any) => {
+      returnData = e
+    })
+    vcStatusRegistry.provider.emit('error', { some: 'error' })
+    setTimeout(() => {
+      assert.deepEqual(returnData, { some: 'error' })
+    },1)
+  })
+
+  it('return the current blockNumber when asked', async () => {
+    sinon.stub(vcStatusRegistry.provider, 'getBlockNumber').returns(Promise.resolve(54))
+    const blockNumber = await vcStatusRegistry.getBlockNumber()
+    assert.equal(blockNumber, 54)
+  })
+
 })
