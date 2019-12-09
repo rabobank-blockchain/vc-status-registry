@@ -64,6 +64,8 @@ export declare class VcStatusRegistry {
     private initiateErrorEventSubscriber;
     getBlockNumber: () => Promise<number>;
     private initiateNewBlockEventSubscriber;
+    getPastStatusSetEvents(fromBlock?: number, toBlock?: string): Promise<Array<ContractEventData>>;
+    getPastStatusRemoveEvents(fromBlock?: number, toBlock?: string): Promise<Array<ContractEventData>>;
 }
 declare class TransactionCount {
     private readonly _wallet;

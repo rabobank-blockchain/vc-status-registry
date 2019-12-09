@@ -16,6 +16,7 @@
 
 import { ethers, providers, Contract, Wallet } from 'ethers'
 import { Subject } from 'rxjs'
+import { Log } from 'ethers/providers'
 
 /**
  * Override Ethereum gas options
@@ -283,6 +284,26 @@ export class VcStatusRegistry {
     this.provider.on('block', (blockNumber) => {
       this._onNewBlock.next({ blockNumber } as NewBlockData)
     })
+  }
+
+  public getPastStatusSetEvents (fromBlock = 0, toBlock = 'latest'): Promise<Array<ContractEventData>> {
+    const filter = {
+      address: this.contractAddress,
+      fromBlock: fromBlock,
+      toBlock: 'latest',
+      topics: [ethers.utils.id(ethers.utils.id('VcStatusSet(address,address)'))]
+    }
+    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
+  }
+
+  public getPastStatusRemoveEvents (fromBlock = 0, toBlock = 'latest'): Promise<Array<ContractEventData>> {
+    const filter = {
+      address: this.contractAddress,
+      fromBlock: fromBlock,
+      toBlock: 'latest',
+      topics: [ethers.utils.id(ethers.utils.id('VcStatusSet(address,address)'))]
+    }
+    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
   }
 
 }
