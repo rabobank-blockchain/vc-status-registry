@@ -238,7 +238,7 @@ class VcStatusRegistry {
             address: this.contractAddress,
             fromBlock: fromBlock,
             toBlock: toBlock,
-            topics: [ethers_1.ethers.utils.id('VcStatusSet(address,address)'), did]
+            topics: [ethers_1.ethers.utils.id('VcStatusSet(address,address)'), [], did]
         };
         return this.provider.getLogs(filter);
     }
@@ -247,7 +247,7 @@ class VcStatusRegistry {
             address: this.contractAddress,
             fromBlock: fromBlock,
             toBlock: toBlock,
-            topics: [ethers_1.ethers.utils.id('VcStatusRemoved(address,address)'), did]
+            topics: [ethers_1.ethers.utils.id('VcStatusRemoved(address,address)'), [], did]
         };
         return this.provider.getLogs(filter);
     }
