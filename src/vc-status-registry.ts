@@ -291,7 +291,7 @@ export class VcStatusRegistry {
       address: this.contractAddress,
       fromBlock: fromBlock,
       toBlock: toBlock,
-      topics: [ethers.utils.id('VcStatusSet(address,address)'), ethers.utils.id(did)]
+      topics: [ethers.utils.id('VcStatusSet(address,address)')]
     }
     return this.provider.getLogs(filter)
   }
@@ -301,7 +301,7 @@ export class VcStatusRegistry {
       address: this.contractAddress,
       fromBlock: fromBlock,
       toBlock: toBlock,
-      topics: [ethers.utils.id('VcStatusRemoved(address,address)'), ethers.utils.id(did)]
+      topics: [ethers.utils.id('VcStatusRemoved(address,address)')]
     }
     return this.provider.getLogs(filter)
   }
