@@ -233,21 +233,21 @@ class VcStatusRegistry {
             this._onNewBlock.next({ blockNumber });
         });
     }
-    getPastStatusSetEvents(fromBlock = 0, toBlock = 'latest') {
+    getPastStatusSetEvents(did, fromBlock = 0, toBlock = 'latest') {
         const filter = {
             address: this.contractAddress,
             fromBlock: fromBlock,
-            toBlock: 'latest',
-            topics: [ethers_1.ethers.utils.id(ethers_1.ethers.utils.id('VcStatusSet(address,address)'))]
+            toBlock: toBlock,
+            topics: [ethers_1.ethers.utils.id('VcStatusSet(address,address)')]
         };
         return this.provider.getLogs(filter);
     }
-    getPastStatusRemoveEvents(fromBlock = 0, toBlock = 'latest') {
+    getPastStatusRemoveEvents(did, fromBlock = 0, toBlock = 'latest') {
         const filter = {
             address: this.contractAddress,
             fromBlock: fromBlock,
-            toBlock: 'latest',
-            topics: [ethers_1.ethers.utils.id(ethers_1.ethers.utils.id('VcStatusSet(address,address)'))]
+            toBlock: toBlock,
+            topics: [ethers_1.ethers.utils.id('VcStatusRemoved(address,address)')]
         };
         return this.provider.getLogs(filter);
     }

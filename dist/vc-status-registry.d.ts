@@ -1,5 +1,6 @@
 import { providers, Wallet } from 'ethers';
 import { Subject } from 'rxjs';
+import { Log } from 'ethers/providers';
 /**
  * Override Ethereum gas options
  */
@@ -64,8 +65,8 @@ export declare class VcStatusRegistry {
     private initiateErrorEventSubscriber;
     getBlockNumber: () => Promise<number>;
     private initiateNewBlockEventSubscriber;
-    getPastStatusSetEvents(fromBlock?: number, toBlock?: string): Promise<Array<ContractEventData>>;
-    getPastStatusRemoveEvents(fromBlock?: number, toBlock?: string): Promise<Array<ContractEventData>>;
+    getPastStatusSetEvents(did: string, fromBlock?: number, toBlock?: string): Promise<Array<Log>>;
+    getPastStatusRemoveEvents(did: string, fromBlock?: number, toBlock?: string): Promise<Array<Log>>;
 }
 declare class TransactionCount {
     private readonly _wallet;
