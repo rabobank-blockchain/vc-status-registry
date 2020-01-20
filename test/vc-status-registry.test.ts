@@ -19,7 +19,6 @@ import * as sinon from 'sinon'
 import * as chaiAsPromised from 'chai-as-promised'
 import * as sinonChai from 'sinon-chai'
 import { VcStatusRegistry, Wallet, TransactionCount, NewBlockData, ContractEventData } from '../src/vc-status-registry'
-import {JsonRpcProvider, Log, TransactionResponse} from 'ethers/providers'
 import { ethers } from 'ethers'
 
 const assert = chai.assert
@@ -44,12 +43,19 @@ describe('Test vcStatusRegistry functionality', () => {
     // Arrange
     const privateKey = '53fd2ebe003d072fe914a90581b8d36964f2392ede2fab9618d4492cff85f35d'
     const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4'
+    const options = {
+      gasLimit: 220000,
+      gasPrice: 111111,
+      txNonceMaxRaceCount: 2,
+      txNonceMaxIdleTime: 2
+    }
 
     // Act
     const vcStatusRegistry = new VcStatusRegistry(
       'https://rinkeby.infura.io',
       contractAddress,
-      privateKey
+      privateKey,
+      options
     )
 
     // Assert
@@ -68,6 +74,38 @@ describe('Test vcStatusRegistry functionality', () => {
 
     // Assert
     assert.exists(vcStatusRegistry)
+  })
+
+  it('should throw if function setVcStatus calls without instantiating with privateKey', () => {
+    // Arrange
+    const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4'
+    const vcStatusRegistry = new VcStatusRegistry(
+      'https://rinkeby.infura.io',
+      contractAddress
+    )
+    const stubContractMethod = sinon
+      .stub((vcStatusRegistry as any), '_contractMethod')
+      .returns(Promise.resolve({ hash: 'dude' }))
+
+    // Act
+
+    return vcStatusRegistry.setVcStatus('credentialId').should.eventually.rejectedWith('Error: Can not call "setVcStatus" without privateKey')
+  })
+
+  it('should throw if function removeVcStatus calls without instantiating with privateKey', () => {
+    // Arrange
+    const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4'
+    const vcStatusRegistry = new VcStatusRegistry(
+      'https://rinkeby.infura.io',
+      contractAddress
+    )
+    const stubContractMethod = sinon
+      .stub((vcStatusRegistry as any), '_contractMethod')
+      .returns(Promise.resolve({ hash: 'dude' }))
+
+    // Act
+
+    return vcStatusRegistry.removeVcStatus('credentialId').should.eventually.rejectedWith('Error: Can not call "removeVcStatus" without privateKey')
   })
 
   it('should throw error if non existent ethereum-provider used', async () => {
@@ -157,10 +195,10 @@ describe('Test vcStatusRegistry functionality', () => {
 
   it('should add values to the registry', async () => {
     const stubContractMethod = sinon
-      .stub(vcStatusRegistry as any, '_contractMethod')
-      .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
+      .stub((vcStatusRegistry as any), '_contractMethod')
+      .returns(Promise.resolve({ hash: 'dude' }))
     sinon
-      .stub(vcStatusRegistry as any, '_getTransactionCount')
+      .stub((vcStatusRegistry as any)._wallet, 'getTransactionCount')
       .returns(Promise.resolve(31415))
 
     // Call it twice so 'racing' is also tested
@@ -177,9 +215,9 @@ describe('Test vcStatusRegistry functionality', () => {
   it('should remove a value from the registry', async () => {
     const stubContractMethod = sinon
       .stub(vcStatusRegistry as any, '_contractMethod')
-      .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
+      .returns(Promise.resolve({ hash: 'dude' }))
     sinon
-      .stub(vcStatusRegistry as any, '_getTransactionCount')
+      .stub((vcStatusRegistry as any)._wallet, 'getTransactionCount')
       .returns(Promise.resolve(31415))
 
     await vcStatusRegistry.removeVcStatus(credentialId3)
@@ -196,9 +234,9 @@ describe('Test vcStatusRegistry functionality', () => {
   it('should throw if setVcStatus is called without privateKey', async () => {
     const stubContractMethod = sinon
       .stub(vcStatusRegistry as any, '_contractMethod')
-      .returns(Promise.resolve({ hash: 'dude' } as TransactionResponse))
+      .returns(Promise.resolve({ hash: 'dude' }))
     sinon
-      .stub(vcStatusRegistry as any, '_getTransactionCount')
+      .stub((vcStatusRegistry as any)._wallet, 'getTransactionCount')
       .returns(Promise.resolve(31415))
 
     const wrapper = async () => {
@@ -210,18 +248,171 @@ describe('Test vcStatusRegistry functionality', () => {
   })
 
   it('should create and get a transaction count', async () => {
-    const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
-    const transactionCount = new TransactionCount(wallet)
+    const options = {
+      txNonceMaxRaceCount: 5,
+      txNonceMaxIdleTime: 30000
+    }
 
-    sinon
-       .stub(transactionCount as any, '_getTransactionCount')
+    const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
+    const transactionCount = new TransactionCount(wallet, options)
+
+    const stubTransactionCount = sinon
+      .stub(wallet, 'getTransactionCount')
       .returns(Promise.resolve(0))
 
     const count1 = await transactionCount.transactionCount()
     const count2 = await transactionCount.transactionCount()
+    const count3 = await transactionCount.transactionCount()
 
     assert.deepEqual(count1, 0)
     assert.deepEqual(count2, 1)
+    assert.deepEqual(count3, 2)
+    assert.isTrue(stubTransactionCount.calledThrice)
+  })
+
+  it('should reset the transaction count because of maxRaceCount', async () => {
+    const options = {
+      txNonceMaxRaceCount: 1,
+      txNonceMaxIdleTime: 30000
+    }
+
+    const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
+    const transactionCount = new TransactionCount(wallet, options)
+
+    const stubTransactionCount = sinon
+      .stub(wallet, 'getTransactionCount')
+      .returns(Promise.resolve(0))
+
+    const count1 = await transactionCount.transactionCount()
+    const count2 = await transactionCount.transactionCount()
+    const count3 = await transactionCount.transactionCount()
+
+    assert.deepEqual(count1, 0)
+    assert.deepEqual(count2, 1)
+    assert.deepEqual(count3, 0)
+    assert.isTrue(stubTransactionCount.calledThrice)
+  })
+
+  it('should reset the transaction count because of maxIdleTime', async () => {
+    const options = {
+      txNonceMaxRaceCount: 5,
+      txNonceMaxIdleTime: 0
+    }
+
+    const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
+    const transactionCount = new TransactionCount(wallet, options)
+
+    const stubTransactionCount = sinon
+      .stub(wallet, 'getTransactionCount')
+      .returns(Promise.resolve(0))
+
+    const count1 = await transactionCount.transactionCount()
+    const count2 = await transactionCount.transactionCount()
+    const count3 = await transactionCount.transactionCount()
+
+    assert.deepEqual(count1, 0)
+    assert.deepEqual(count2, 0)
+    assert.deepEqual(count3, 0)
+    assert.isTrue(stubTransactionCount.calledThrice)
+  })
+
+  it('should return exactly this ABI', () => {
+    const ABI = [
+      {
+        'constant': false,
+        'inputs': [
+          {
+            'name': 'credentialId',
+            'type': 'address'
+          }
+        ],
+        'name': 'setVcStatus',
+        'outputs': [],
+        'payable': false,
+        'stateMutability': 'nonpayable',
+        'type': 'function'
+      },
+      {
+        'constant': false,
+        'inputs': [
+          {
+            'name': 'credentialId',
+            'type': 'address'
+          }
+        ],
+        'name': 'removeVcStatus',
+        'outputs': [],
+        'payable': false,
+        'stateMutability': 'nonpayable',
+        'type': 'function'
+      },
+      {
+        'constant': true,
+        'inputs': [
+          {
+            'name': 'issuer',
+            'type': 'address'
+          },
+          {
+            'name': 'credentialId',
+            'type': 'address'
+          }
+        ],
+        'name': 'getVcStatus',
+        'outputs': [
+          {
+            'name': '',
+            'type': 'bool'
+          }
+        ],
+        'payable': false,
+        'stateMutability': 'view',
+        'type': 'function'
+      },
+      {
+        'anonymous': false,
+        'inputs': [
+          {
+            'indexed': true,
+            'name': 'issuer',
+            'type': 'address'
+          },
+          {
+            'indexed': true,
+            'name': 'credentialId',
+            'type': 'address'
+          }
+        ],
+        'name': 'VcStatusSet',
+        'type': 'event'
+      },
+      {
+        'anonymous': false,
+        'inputs': [
+          {
+            'indexed': true,
+            'name': 'issuer',
+            'type': 'address'
+          },
+          {
+            'indexed': true,
+            'name': 'credentialId',
+            'type': 'address'
+          }
+        ],
+        'name': 'VcStatusRemoved',
+        'type': 'event'
+      }
+    ]
+
+    const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4'
+    const vcStatusRegistry = new VcStatusRegistry(
+      'https://rinkeby.infura.io',
+      contractAddress
+    )
+
+    // Act
+    assert.deepEqual(vcStatusRegistry.ABI, ABI)
   })
 
   it('should forward the event when SetVcStatus happens on the contract', async () => {
@@ -285,6 +476,7 @@ describe('Test vcStatusRegistry functionality', () => {
       assert.deepEqual(returnData, { blockNumber: 12 })
     },1)
   })
+
   it('should forward the error when it happens on the blockchain', async () => {
     let returnData: any
     vcStatusRegistry.onError.subscribe(async (e: any) => {

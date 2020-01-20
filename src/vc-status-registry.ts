@@ -28,12 +28,6 @@ declare interface VcStatusRegistryOptions {
   txNonceMaxIdleTime?: number
 }
 
-declare interface Account {
-  address?: string
-  privateKey?: string
-  publicKey?: string
-}
-
 const ABI = [
   {
     'constant': false,
@@ -142,8 +136,6 @@ export class VcStatusRegistry {
   private _provider: providers.JsonRpcProvider
   private readonly _wallet: Wallet | undefined
   private readonly _contract: Contract
-  private readonly _gasLimit: number | undefined
-  private readonly _gasPrice: number | undefined
   private _transactionCount: TransactionCount | undefined
   private _onNewBlock = new Subject<NewBlockData>()
   private _onSetVcStatus = new Subject<ContractEventData>()
@@ -158,19 +150,17 @@ export class VcStatusRegistry {
    * @param options optional, see VcStatusRegistryOptions
    */
   constructor (
-      private readonly _ethereumProvider: string,
-      private readonly _contractAddress: string,
-      privateKey?: string,
-      options: VcStatusRegistryOptions = {}
+    private readonly _ethereumProvider: string,
+    private readonly _contractAddress: string,
+    privateKey?: string,
+    private readonly _options: VcStatusRegistryOptions = {}
   ) {
-    this._gasLimit = options.gasLimit
-    this._gasPrice = options.gasPrice
     this._provider = new ethers.providers.JsonRpcProvider(this._ethereumProvider)
     this._contract = new ethers.Contract(this._contractAddress, ABI, this._provider)
 
     if (privateKey) {
       this._wallet = new ethers.Wallet(Buffer.from(privateKey, 'hex'), this._provider)
-      this._transactionCount = new TransactionCount(this._wallet, options)
+      this._transactionCount = new TransactionCount(this._wallet, this._options)
       this._contract = this._contract.connect(this._wallet)
     }
     this.initiateEventSubscriptions()
@@ -191,6 +181,11 @@ export class VcStatusRegistry {
   get wallet (): Wallet | undefined {
     return this._wallet
   }
+
+  get ABI (): object {
+    return ABI
+  }
+
   get onNewBlock (): Subject<NewBlockData> {
     return this._onNewBlock
   }
@@ -203,6 +198,7 @@ export class VcStatusRegistry {
   get onError (): Subject<any> {
     return this._onError
   }
+
   public setVcStatus = async (credentialId: string): Promise<string> => {
     const txResponse = await this._sendSignedTransaction('setVcStatus', [credentialId])
     return txResponse.hash as string
@@ -221,18 +217,13 @@ export class VcStatusRegistry {
     if (!this._wallet) {
       throw (new Error(`Error: Can not call "${method}" without privateKey`))
     }
-    const nonce = await this._getTransactionCount()
+    const nonce = await (this._transactionCount as TransactionCount).transactionCount()
     const overrides = {
       nonce: nonce,
-      gasPrice: this._gasPrice,
-      gasLimit: this._gasLimit
+      gasPrice: this._options.gasPrice,
+      gasLimit: this._options.gasLimit
     }
     return this._contractMethod(method, parameters, overrides)
-  }
-
-  // Isolate external function for sinon stub
-  private _getTransactionCount = async () => {
-    return (this._transactionCount as TransactionCount).transactionCount()
   }
 
   // Isolate external function for sinon stub
@@ -326,16 +317,15 @@ class TransactionCount {
   constructor (private readonly _wallet: Wallet, private readonly _options: VcStatusRegistryOptions = {}) {}
 
   public transactionCount = async (): Promise<number> => {
-    const maxRaceCount = this._options.txNonceMaxRaceCount || 100
-    const maxIdleTime = this._options.txNonceMaxIdleTime || 30000 // Make sure to skip at least 1 block
+    const maxRaceCount = this._options.txNonceMaxRaceCount !== undefined ? this._options.txNonceMaxRaceCount : 100
+    let maxIdleTime = this._options.txNonceMaxIdleTime !== undefined ? this._options.txNonceMaxIdleTime : 30000 // Make sure to skip at least 1 block
 
     const now = new Date().valueOf() // Time in miliseconds since 1970
-    const nonce = await this._getTransactionCount()
-
+    const nonce = await this._wallet.getTransactionCount()
     if (
       (nonce > this._currentTransaction) ||
-      (this._raceCount > maxRaceCount) ||
-      ((now - this._lastTxTime) > maxIdleTime)
+      (this._raceCount >= maxRaceCount) ||
+      ((now - this._lastTxTime) >= maxIdleTime)
     ) {
       // Normal situation
       this._raceCount = 0
@@ -348,11 +338,6 @@ class TransactionCount {
       this._lastTxTime = now
       return ++this._currentTransaction
     }
-  }
-
-  // Isolate external function for sinon stub
-  private _getTransactionCount = async () => {
-    return (this._wallet).getTransactionCount()
   }
 }
 
