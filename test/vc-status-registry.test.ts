@@ -34,6 +34,8 @@ before(() => {
 // const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4';
 // const credentialId = '0x72d3bc4da6e025540edbfee8b376918f95ec59e4';
 
+const provider = 'https://rinkeby.infura.io/v3/8c630f5a59e249aa95cf499bde4860e9'
+
 describe('Test vcStatusRegistry functionality', () => {
   afterEach(() => {
     sinon.restore()
@@ -52,7 +54,7 @@ describe('Test vcStatusRegistry functionality', () => {
 
     // Act
     const vcStatusRegistry = new VcStatusRegistry(
-      'https://rinkeby.infura.io',
+      provider,
       contractAddress,
       privateKey,
       options
@@ -68,7 +70,7 @@ describe('Test vcStatusRegistry functionality', () => {
 
     // Act
     const vcStatusRegistry = new VcStatusRegistry(
-      'https://rinkeby.infura.io',
+      provider,
       contractAddress
     )
 
@@ -80,7 +82,7 @@ describe('Test vcStatusRegistry functionality', () => {
     // Arrange
     const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4'
     const vcStatusRegistry = new VcStatusRegistry(
-      'https://rinkeby.infura.io',
+      provider,
       contractAddress
     )
     const stubContractMethod = sinon
@@ -96,7 +98,7 @@ describe('Test vcStatusRegistry functionality', () => {
     // Arrange
     const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4'
     const vcStatusRegistry = new VcStatusRegistry(
-      'https://rinkeby.infura.io',
+      provider,
       contractAddress
     )
     const stubContractMethod = sinon
@@ -137,7 +139,7 @@ describe('Test vcStatusRegistry functionality', () => {
 
     // Act
     const vcStatusRegistry = new VcStatusRegistry(
-      'https://rinkeby.infura.io',
+      provider,
       contractAddress
     )
 
@@ -152,7 +154,6 @@ describe('Test vcStatusRegistry functionality', () => {
   const credentialId1 = '0xf8fC941a64cFb70C8E34010f7370D84076d0361A'
   const credentialId2 = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4'
   const credentialId3 = '0x72d3bc4da6e025540edbfee8b376918f95ec59e4'
-  const provider = 'https://rinkeby.infura.io'
 
   const vcStatusRegistry = new VcStatusRegistry(
     provider,
@@ -183,9 +184,8 @@ describe('Test vcStatusRegistry functionality', () => {
 
   it('should succesfully getVcStatus function()', async () => {
     const stubGetVcStatus = sinon
-      .stub(vcStatusRegistry, 'getVcStatus')
+      .stub(vcStatusRegistry as any, 'getVcStatus')
       .returns(Promise.resolve('true'))
-
     const result = await vcStatusRegistry.getVcStatus(issuer, credentialId3)
 
     // Assert
@@ -407,7 +407,7 @@ describe('Test vcStatusRegistry functionality', () => {
 
     const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4'
     const vcStatusRegistry = new VcStatusRegistry(
-      'https://rinkeby.infura.io',
+      provider,
       contractAddress
     )
 

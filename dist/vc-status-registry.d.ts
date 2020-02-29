@@ -26,11 +26,10 @@ export interface NewBlockData {
 export declare class VcStatusRegistry {
     private readonly _ethereumProvider;
     private readonly _contractAddress;
+    private readonly _options;
     private _provider;
     private readonly _wallet;
     private readonly _contract;
-    private readonly _gasLimit;
-    private readonly _gasPrice;
     private _transactionCount;
     private _onNewBlock;
     private _onSetVcStatus;
@@ -43,20 +42,20 @@ export declare class VcStatusRegistry {
      * @param privateKey optional, private key for issuing credentials
      * @param options optional, see VcStatusRegistryOptions
      */
-    constructor(_ethereumProvider: string, _contractAddress: string, privateKey?: string, options?: VcStatusRegistryOptions);
-    get ethereumProvider(): string;
-    get contractAddress(): string;
-    get provider(): providers.JsonRpcProvider;
-    get wallet(): Wallet | undefined;
-    get onNewBlock(): Subject<NewBlockData>;
-    get onSetVcStatus(): Subject<ContractEventData>;
-    get onRemoveVcStatus(): Subject<ContractEventData>;
-    get onError(): Subject<any>;
+    constructor(_ethereumProvider: string, _contractAddress: string, privateKey?: string, _options?: VcStatusRegistryOptions);
+    readonly ethereumProvider: string;
+    readonly contractAddress: string;
+    readonly provider: providers.JsonRpcProvider;
+    readonly wallet: Wallet | undefined;
+    readonly ABI: object;
+    readonly onNewBlock: Subject<NewBlockData>;
+    readonly onSetVcStatus: Subject<ContractEventData>;
+    readonly onRemoveVcStatus: Subject<ContractEventData>;
+    readonly onError: Subject<any>;
     setVcStatus: (credentialId: string) => Promise<string>;
     removeVcStatus: (credentialId: string) => Promise<string>;
     getVcStatus: (issuer: string, credentialId: string) => Promise<string>;
     private _sendSignedTransaction;
-    private _getTransactionCount;
     private _contractMethod;
     private initiateEventSubscriptions;
     private initiateStatusSetEventSubscriber;
@@ -83,7 +82,6 @@ declare class TransactionCount {
     private _lastTxTime;
     constructor(_wallet: Wallet, _options?: VcStatusRegistryOptions);
     transactionCount: () => Promise<number>;
-    private _getTransactionCount;
 }
 export { Wallet, TransactionCount };
 export default VcStatusRegistry;

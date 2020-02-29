@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -122,9 +121,10 @@ class VcStatusRegistry {
      * @param privateKey optional, private key for issuing credentials
      * @param options optional, see VcStatusRegistryOptions
      */
-    constructor(_ethereumProvider, _contractAddress, privateKey, options = {}) {
+    constructor(_ethereumProvider, _contractAddress, privateKey, _options = {}) {
         this._ethereumProvider = _ethereumProvider;
         this._contractAddress = _contractAddress;
+        this._options = _options;
         this._onNewBlock = new rxjs_1.Subject();
         this._onSetVcStatus = new rxjs_1.Subject();
         this._onRemoveVcStatus = new rxjs_1.Subject();
@@ -144,17 +144,13 @@ class VcStatusRegistry {
             if (!this._wallet) {
                 throw (new Error(`Error: Can not call "${method}" without privateKey`));
             }
-            const nonce = yield this._getTransactionCount();
+            const nonce = yield this._transactionCount.transactionCount();
             const overrides = {
                 nonce: nonce,
-                gasPrice: this._gasPrice,
-                gasLimit: this._gasLimit
+                gasPrice: this._options.gasPrice,
+                gasLimit: this._options.gasLimit
             };
             return this._contractMethod(method, parameters, overrides);
-        });
-        // Isolate external function for sinon stub
-        this._getTransactionCount = () => __awaiter(this, void 0, void 0, function* () {
-            return this._transactionCount.transactionCount();
         });
         // Isolate external function for sinon stub
         this._contractMethod = (method, parameters, overrides) => __awaiter(this, void 0, void 0, function* () {
@@ -164,13 +160,11 @@ class VcStatusRegistry {
         this.getBlockNumber = () => __awaiter(this, void 0, void 0, function* () {
             return this.provider.getBlockNumber();
         });
-        this._gasLimit = options.gasLimit;
-        this._gasPrice = options.gasPrice;
         this._provider = new ethers_1.ethers.providers.JsonRpcProvider(this._ethereumProvider);
         this._contract = new ethers_1.ethers.Contract(this._contractAddress, ABI, this._provider);
         if (privateKey) {
             this._wallet = new ethers_1.ethers.Wallet(Buffer.from(privateKey, 'hex'), this._provider);
-            this._transactionCount = new TransactionCount(this._wallet, options);
+            this._transactionCount = new TransactionCount(this._wallet, this._options);
             this._contract = this._contract.connect(this._wallet);
         }
         this.initiateEventSubscriptions();
@@ -186,6 +180,9 @@ class VcStatusRegistry {
     }
     get wallet() {
         return this._wallet;
+    }
+    get ABI() {
+        return ABI;
     }
     get onNewBlock() {
         return this._onNewBlock;
@@ -271,13 +268,13 @@ class TransactionCount {
         this._raceCount = 0;
         this._lastTxTime = 0;
         this.transactionCount = () => __awaiter(this, void 0, void 0, function* () {
-            const maxRaceCount = this._options.txNonceMaxRaceCount || 100;
-            const maxIdleTime = this._options.txNonceMaxIdleTime || 30000; // Make sure to skip at least 1 block
+            const maxRaceCount = this._options.txNonceMaxRaceCount !== undefined ? this._options.txNonceMaxRaceCount : 100;
+            let maxIdleTime = this._options.txNonceMaxIdleTime !== undefined ? this._options.txNonceMaxIdleTime : 30000; // Make sure to skip at least 1 block
             const now = new Date().valueOf(); // Time in miliseconds since 1970
-            const nonce = yield this._getTransactionCount();
+            const nonce = yield this._wallet.getTransactionCount();
             if ((nonce > this._currentTransaction) ||
-                (this._raceCount > maxRaceCount) ||
-                ((now - this._lastTxTime) > maxIdleTime)) {
+                (this._raceCount >= maxRaceCount) ||
+                ((now - this._lastTxTime) >= maxIdleTime)) {
                 // Normal situation
                 this._raceCount = 0;
                 this._lastTxTime = now;
@@ -290,10 +287,6 @@ class TransactionCount {
                 this._lastTxTime = now;
                 return ++this._currentTransaction;
             }
-        });
-        // Isolate external function for sinon stub
-        this._getTransactionCount = () => __awaiter(this, void 0, void 0, function* () {
-            return (this._wallet).getTransactionCount();
         });
     }
 }
