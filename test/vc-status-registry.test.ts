@@ -34,7 +34,7 @@ before(() => {
 // const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4';
 // const credentialId = '0x72d3bc4da6e025540edbfee8b376918f95ec59e4';
 
-const provider = 'https://rinkeby.infura.io/v3/8c630f5a59e249aa95cf499bde4860e9'
+const provider = 'https://rinkeby.infura.io/'
 
 describe('Test vcStatusRegistry functionality', () => {
   afterEach(() => {

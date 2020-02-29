@@ -16,7 +16,6 @@
 
 import { ethers, providers, Contract, Wallet } from 'ethers'
 import { Subject } from 'rxjs'
-import { Log } from 'ethers/providers'
 
 /**
  * Override Ethereum gas options
