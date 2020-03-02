@@ -25,6 +25,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const ethers_1 = require("ethers");
 exports.Wallet = ethers_1.Wallet;
+const transaction_count_1 = require("./transaction-count");
+exports.TransactionCount = transaction_count_1.default;
 const rxjs_1 = require("rxjs");
 const ABI = [
     {
@@ -164,10 +166,13 @@ class VcStatusRegistry {
         this._contract = new ethers_1.ethers.Contract(this._contractAddress, ABI, this._provider);
         if (privateKey) {
             this._wallet = new ethers_1.ethers.Wallet(Buffer.from(privateKey, 'hex'), this._provider);
-            this._transactionCount = new TransactionCount(this._wallet, this._options);
+            this._transactionCount = new transaction_count_1.default(this._wallet, this._options);
             this._contract = this._contract.connect(this._wallet);
         }
-        this.initiateEventSubscriptions();
+        this.initiateStatusSetEventSubscriber();
+        this.initiateStatusRemovedEventSubscriber();
+        this.initiateErrorEventSubscriber();
+        this.initiateNewBlockEventSubscriber();
     }
     get ethereumProvider() {
         return this._ethereumProvider;
@@ -195,12 +200,6 @@ class VcStatusRegistry {
     }
     get onError() {
         return this._onError;
-    }
-    initiateEventSubscriptions() {
-        this.initiateStatusSetEventSubscriber();
-        this.initiateStatusRemovedEventSubscriber();
-        this.initiateErrorEventSubscriber();
-        this.initiateNewBlockEventSubscriber();
     }
     initiateStatusSetEventSubscriber() {
         const statusSetFilter = {
@@ -231,65 +230,23 @@ class VcStatusRegistry {
         });
     }
     getPastStatusSetEvents(did, fromBlock = 0, toBlock = 'latest') {
-        const filter = {
-            address: this.contractAddress,
-            fromBlock: fromBlock,
-            toBlock: toBlock,
-            // second argument is an empty array to ignore issuer did
-            topics: [ethers_1.ethers.utils.id('VcStatusSet(address,address)'), [], did]
-        };
+        const filter = this.getFilter('VcStatusSet(address,address)', fromBlock, toBlock, did);
         return this.provider.getLogs(filter);
     }
     getPastStatusRemoveEvents(did, fromBlock = 0, toBlock = 'latest') {
-        const filter = {
+        const filter = this.getFilter('VcStatusRemoved(address,address)', fromBlock, toBlock, did);
+        return this.provider.getLogs(filter);
+    }
+    getFilter(eventId, fromBlock, toBlock, did) {
+        return {
             address: this.contractAddress,
             fromBlock: fromBlock,
             toBlock: toBlock,
             // second argument is an empty array to ignore issuer did
-            topics: [ethers_1.ethers.utils.id('VcStatusRemoved(address,address)'), [], did]
+            topics: [eventId, [], did]
         };
-        return this.provider.getLogs(filter);
     }
 }
 exports.VcStatusRegistry = VcStatusRegistry;
-class TransactionCount {
-    constructor(_wallet, _options = {}) {
-        this._wallet = _wallet;
-        this._options = _options;
-        /**
-         * currentTransaction holds the last transactionCount
-         * Race conditions might occur. try to manage:
-         * - transactionNr missed. reset if raceCount > maxRaceCount
-         * - idle for some time. reset if lastTxTime > maxIdleTime
-         * In the future you might want to handle this completely different by keeping
-         * track of all open requests
-         */
-        this._currentTransaction = 0;
-        this._raceCount = 0;
-        this._lastTxTime = 0;
-        this.transactionCount = () => __awaiter(this, void 0, void 0, function* () {
-            const maxRaceCount = this._options.txNonceMaxRaceCount !== undefined ? this._options.txNonceMaxRaceCount : 100;
-            let maxIdleTime = this._options.txNonceMaxIdleTime !== undefined ? this._options.txNonceMaxIdleTime : 30000; // Make sure to skip at least 1 block
-            const now = new Date().valueOf(); // Time in miliseconds since 1970
-            const nonce = yield this._wallet.getTransactionCount();
-            if ((nonce > this._currentTransaction) ||
-                (this._raceCount >= maxRaceCount) ||
-                ((now - this._lastTxTime) >= maxIdleTime)) {
-                // Normal situation
-                this._raceCount = 0;
-                this._lastTxTime = now;
-                this._currentTransaction = nonce;
-                return this._currentTransaction;
-            }
-            else {
-                // We might be racing. Add one more transaction
-                this._raceCount++;
-                this._lastTxTime = now;
-                return ++this._currentTransaction;
-            }
-        });
-    }
-}
-exports.TransactionCount = TransactionCount;
 exports.default = VcStatusRegistry;
 //# sourceMappingURL=vc-status-registry.js.map

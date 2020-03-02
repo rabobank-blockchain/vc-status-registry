@@ -15,17 +15,9 @@
  */
 
 import { ethers, providers, Contract, Wallet } from 'ethers'
+import { VcStatusRegistryOptions, ContractEventData, NewBlockData } from './interfaces'
+import TransactionCount from './transaction-count'
 import { Subject } from 'rxjs'
-
-/**
- * Override Ethereum gas options
- */
-declare interface VcStatusRegistryOptions {
-  gasLimit?: number
-  gasPrice?: number
-  txNonceMaxRaceCount?: number
-  txNonceMaxIdleTime?: number
-}
 
 const ABI = [
   {
@@ -115,22 +107,6 @@ const ABI = [
   }
 ]
 
-export interface ContractEventData {
-  blockNumber: number
-  blockHash: string
-  transactionIndex: number
-  removed: boolean
-  address: string
-  data: string
-  topics: string[]
-  transactionHash: string
-  logIndex: number
-}
-
-export interface NewBlockData {
-  blockNumber: number
-}
-
 export class VcStatusRegistry {
   private _provider: providers.JsonRpcProvider
   private readonly _wallet: Wallet | undefined
@@ -162,7 +138,10 @@ export class VcStatusRegistry {
       this._transactionCount = new TransactionCount(this._wallet, this._options)
       this._contract = this._contract.connect(this._wallet)
     }
-    this.initiateEventSubscriptions()
+    this.initiateStatusSetEventSubscriber()
+    this.initiateStatusRemovedEventSubscriber()
+    this.initiateErrorEventSubscriber()
+    this.initiateNewBlockEventSubscriber()
   }
 
   get ethereumProvider (): string {
@@ -230,13 +209,6 @@ export class VcStatusRegistry {
     return this._contract[method](...parameters, overrides)
   }
 
-  private initiateEventSubscriptions () {
-    this.initiateStatusSetEventSubscriber()
-    this.initiateStatusRemovedEventSubscriber()
-    this.initiateErrorEventSubscriber()
-    this.initiateNewBlockEventSubscriber()
-  }
-
   private initiateStatusSetEventSubscriber () {
     const statusSetFilter = {
       address: this.contractAddress,
@@ -248,7 +220,6 @@ export class VcStatusRegistry {
   }
 
   private initiateStatusRemovedEventSubscriber () {
-
     const statusRemoveFilter = {
       address: this.contractAddress,
       topics: [ethers.utils.id('VcStatusRemoved(address,address)')]
@@ -277,68 +248,31 @@ export class VcStatusRegistry {
   }
 
   public getPastStatusSetEvents (did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
-    const filter = {
-      address: this.contractAddress,
-      fromBlock: fromBlock,
-      toBlock: toBlock,
-      // second argument is an empty array to ignore issuer did
-      topics: [ethers.utils.id('VcStatusSet(address,address)'), [], did]
-    }
+    const filter = this.getFilter('VcStatusSet(address,address)', fromBlock, toBlock, did)
     return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
   }
 
   public getPastStatusRemoveEvents (did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
-    const filter = {
+    const filter = this.getFilter('VcStatusRemoved(address,address)', fromBlock, toBlock, did)
+    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
+  }
+
+  private getFilter (eventId: string, fromBlock: number | string, toBlock: number | string, did: string): any {
+    return {
       address: this.contractAddress,
       fromBlock: fromBlock,
       toBlock: toBlock,
       // second argument is an empty array to ignore issuer did
-      topics: [ethers.utils.id('VcStatusRemoved(address,address)'), [], did]
-    }
-    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
-  }
-
-}
-
-class TransactionCount {
-  /**
-   * currentTransaction holds the last transactionCount
-   * Race conditions might occur. try to manage:
-   * - transactionNr missed. reset if raceCount > maxRaceCount
-   * - idle for some time. reset if lastTxTime > maxIdleTime
-   * In the future you might want to handle this completely different by keeping
-   * track of all open requests
-   */
-  private _currentTransaction = 0
-  private _raceCount = 0
-  private _lastTxTime = 0
-
-  constructor (private readonly _wallet: Wallet, private readonly _options: VcStatusRegistryOptions = {}) {}
-
-  public transactionCount = async (): Promise<number> => {
-    const maxRaceCount = this._options.txNonceMaxRaceCount !== undefined ? this._options.txNonceMaxRaceCount : 100
-    let maxIdleTime = this._options.txNonceMaxIdleTime !== undefined ? this._options.txNonceMaxIdleTime : 30000 // Make sure to skip at least 1 block
-
-    const now = new Date().valueOf() // Time in miliseconds since 1970
-    const nonce = await this._wallet.getTransactionCount()
-    if (
-      (nonce > this._currentTransaction) ||
-      (this._raceCount >= maxRaceCount) ||
-      ((now - this._lastTxTime) >= maxIdleTime)
-    ) {
-      // Normal situation
-      this._raceCount = 0
-      this._lastTxTime = now
-      this._currentTransaction = nonce
-      return this._currentTransaction
-    } else {
-      // We might be racing. Add one more transaction
-      this._raceCount++
-      this._lastTxTime = now
-      return ++this._currentTransaction
+      topics: [ethers.utils.id(eventId), [], did]
     }
   }
 }
 
-export { Wallet, TransactionCount }
+export {
+  Wallet,
+  TransactionCount,
+  VcStatusRegistryOptions,
+  ContractEventData,
+  NewBlockData
+}
 export default VcStatusRegistry
