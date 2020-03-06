@@ -247,24 +247,21 @@ export class VcStatusRegistry {
     })
   }
 
-  public getPastStatusSetEvents (did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
-    const filter = this.getFilter('VcStatusSet(address,address)', fromBlock, toBlock, did)
-    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
-  }
-
-  public getPastStatusRemoveEvents (did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
-    const filter = this.getFilter('VcStatusRemoved(address,address)', fromBlock, toBlock, did)
-    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
-  }
-
-  private getFilter (eventId: string, fromBlock: number | string, toBlock: number | string, did: string): any {
-    return {
+  public getPastStatusEvents (eventType: string, did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
+    let eventId: string
+    switch (eventType) {
+      case 'set': eventId = 'VcStatusSet(address,address)'; break
+      case 'remove': eventId = 'VcStatusRemoved(address,address)'; break
+      default: throw new Error(`Unknown event type '${eventType}'`)
+    }
+    const filter = {
       address: this.contractAddress,
       fromBlock: fromBlock,
       toBlock: toBlock,
       // second argument is an empty array to ignore issuer did
       topics: [ethers.utils.id(eventId), [], did]
     }
+    return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
   }
 }
 
