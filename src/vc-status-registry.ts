@@ -201,7 +201,7 @@ export class VcStatusRegistry {
     return this._contract[method](...parameters, overrides)
   }
 
-  private initiateStatusEventSubscriber(eventType: PastEventType) {
+  private initiateStatusEventSubscriber (eventType: PastEventType) {
     const eventId = (eventType === PastEventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)'
     const statusSetFilter = {
       address: this.contractAddress,
@@ -232,7 +232,7 @@ export class VcStatusRegistry {
     })
   }
 
-  public getPastStatusEvents(eventType: PastEventType, did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
+  public getPastStatusEvents (eventType: PastEventType, did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
     const eventId: string = (eventType === PastEventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)'
     const filter = {
       address: this.contractAddress,
