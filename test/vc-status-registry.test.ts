@@ -101,13 +101,8 @@ describe('Test vcStatusRegistry functionality', () => {
       provider,
       contractAddress
     )
-    const stubContractMethod = sinon
-      .stub((vcStatusRegistry as any), '_contractMethod')
-      .returns(Promise.resolve({ hash: 'dude' }))
-
     // Act
-
-    return vcStatusRegistry.removeVcStatus('credentialId').should.eventually.rejectedWith('Error: Can not call "removeVcStatus" without privateKey')
+    return vcStatusRegistry.setVcStatus('credentialId', false).should.eventually.rejectedWith('Error: Can not call "removeVcStatus" without privateKey')
   })
 
   it('should throw error if non existent ethereum-provider used', async () => {
@@ -144,7 +139,7 @@ describe('Test vcStatusRegistry functionality', () => {
     )
 
     // Assert
-    vcStatusRegistry.removeVcStatus(credentialId).should.eventually.be.rejectedWith('Error: Can not call "removeVcStatus" without privateKey')
+    vcStatusRegistry.setVcStatus(credentialId, false).should.eventually.be.rejectedWith('Error: Can not call "removeVcStatus" without privateKey')
   })
 
   // Arrange
@@ -220,7 +215,7 @@ describe('Test vcStatusRegistry functionality', () => {
       .stub((vcStatusRegistry as any)._wallet, 'getTransactionCount')
       .returns(Promise.resolve(31415))
 
-    await vcStatusRegistry.removeVcStatus(credentialId3)
+    await vcStatusRegistry.setVcStatus(credentialId3, false)
 
     // Assert
     assert.isTrue(stubContractMethod.calledOnce)

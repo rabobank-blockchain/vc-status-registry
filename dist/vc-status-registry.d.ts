@@ -22,28 +22,24 @@ export declare class VcStatusRegistry {
      * @param options optional, see VcStatusRegistryOptions
      */
     constructor(_ethereumProvider: string, _contractAddress: string, privateKey?: string, _options?: VcStatusRegistryOptions);
-    readonly ethereumProvider: string;
-    readonly contractAddress: string;
-    readonly provider: providers.JsonRpcProvider;
-    readonly wallet: Wallet | undefined;
-    readonly ABI: object;
-    readonly onNewBlock: Subject<NewBlockData>;
-    readonly onSetVcStatus: Subject<ContractEventData>;
-    readonly onRemoveVcStatus: Subject<ContractEventData>;
-    readonly onError: Subject<any>;
-    setVcStatus: (credentialId: string) => Promise<string>;
-    removeVcStatus: (credentialId: string) => Promise<string>;
+    get ethereumProvider(): string;
+    get contractAddress(): string;
+    get provider(): providers.JsonRpcProvider;
+    get wallet(): Wallet | undefined;
+    get ABI(): object;
+    get onNewBlock(): Subject<NewBlockData>;
+    get onSetVcStatus(): Subject<ContractEventData>;
+    get onRemoveVcStatus(): Subject<ContractEventData>;
+    get onError(): Subject<any>;
+    setVcStatus: (credentialId: string, value?: boolean) => Promise<string>;
     getVcStatus: (issuer: string, credentialId: string) => Promise<string>;
-    private _sendSignedTransaction;
     private _contractMethod;
     private initiateStatusSetEventSubscriber;
     private initiateStatusRemovedEventSubscriber;
     private initiateErrorEventSubscriber;
     getBlockNumber: () => Promise<number>;
     private initiateNewBlockEventSubscriber;
-    getPastStatusSetEvents(did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>;
-    getPastStatusRemoveEvents(did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>;
-    private getFilter;
+    getPastStatusEvents(eventType: string, did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>;
 }
-export { Wallet, TransactionCount };
+export { Wallet, TransactionCount, VcStatusRegistryOptions, ContractEventData, NewBlockData };
 export default VcStatusRegistry;

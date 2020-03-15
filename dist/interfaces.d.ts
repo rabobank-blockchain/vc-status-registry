@@ -1,13 +1,13 @@
 /**
  * Override Ethereum gas options
  */
-declare interface VcStatusRegistryOptions {
+export interface VcStatusRegistryOptions {
     gasLimit?: number;
     gasPrice?: number;
     txNonceMaxRaceCount?: number;
     txNonceMaxIdleTime?: number;
 }
-declare interface ContractEventData {
+export interface ContractEventData {
     blockNumber: number;
     blockHash: string;
     transactionIndex: number;
@@ -18,7 +18,6 @@ declare interface ContractEventData {
     transactionHash: string;
     logIndex: number;
 }
-declare interface NewBlockData {
+export interface NewBlockData {
     blockNumber: number;
 }
-export { VcStatusRegistryOptions, ContractEventData, NewBlockData };

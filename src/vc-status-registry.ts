@@ -177,21 +177,8 @@ export class VcStatusRegistry {
     return this._onError
   }
 
-  public setVcStatus = async (credentialId: string): Promise<string> => {
-    const txResponse = await this._sendSignedTransaction('setVcStatus', [credentialId])
-    return txResponse.hash as string
-  }
-
-  public removeVcStatus = async (credentialId: string): Promise<string> => {
-    const txResponse = await this._sendSignedTransaction('removeVcStatus', [credentialId])
-    return txResponse.hash as string
-  }
-
-  public getVcStatus = async (issuer: string, credentialId: string): Promise<string> => {
-    return this._contract.getVcStatus(issuer, credentialId)
-  }
-
-  private _sendSignedTransaction = async (method: string, parameters: any[]): Promise<ethers.providers.TransactionResponse> => {
+  public setVcStatus = async (credentialId: string, value = true): Promise<string> => {
+    const method = value ? 'setVcStatus' : 'removeVcStatus'
     if (!this._wallet) {
       throw (new Error(`Error: Can not call "${method}" without privateKey`))
     }
@@ -201,7 +188,12 @@ export class VcStatusRegistry {
       gasPrice: this._options.gasPrice,
       gasLimit: this._options.gasLimit
     }
-    return this._contractMethod(method, parameters, overrides)
+    const txResponse = await this._contractMethod(method, [credentialId], overrides)
+    return txResponse.hash as string
+  }
+
+  public getVcStatus = async (issuer: string, credentialId: string): Promise<string> => {
+    return this._contract.getVcStatus(issuer, credentialId)
   }
 
   // Isolate external function for sinon stub

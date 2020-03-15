@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -131,18 +132,8 @@ class VcStatusRegistry {
         this._onSetVcStatus = new rxjs_1.Subject();
         this._onRemoveVcStatus = new rxjs_1.Subject();
         this._onError = new rxjs_1.Subject();
-        this.setVcStatus = (credentialId) => __awaiter(this, void 0, void 0, function* () {
-            const txResponse = yield this._sendSignedTransaction('setVcStatus', [credentialId]);
-            return txResponse.hash;
-        });
-        this.removeVcStatus = (credentialId) => __awaiter(this, void 0, void 0, function* () {
-            const txResponse = yield this._sendSignedTransaction('removeVcStatus', [credentialId]);
-            return txResponse.hash;
-        });
-        this.getVcStatus = (issuer, credentialId) => __awaiter(this, void 0, void 0, function* () {
-            return this._contract.getVcStatus(issuer, credentialId);
-        });
-        this._sendSignedTransaction = (method, parameters) => __awaiter(this, void 0, void 0, function* () {
+        this.setVcStatus = (credentialId, value = true) => __awaiter(this, void 0, void 0, function* () {
+            const method = value ? 'setVcStatus' : 'removeVcStatus';
             if (!this._wallet) {
                 throw (new Error(`Error: Can not call "${method}" without privateKey`));
             }
@@ -152,7 +143,11 @@ class VcStatusRegistry {
                 gasPrice: this._options.gasPrice,
                 gasLimit: this._options.gasLimit
             };
-            return this._contractMethod(method, parameters, overrides);
+            const txResponse = yield this._contractMethod(method, [credentialId], overrides);
+            return txResponse.hash;
+        });
+        this.getVcStatus = (issuer, credentialId) => __awaiter(this, void 0, void 0, function* () {
+            return this._contract.getVcStatus(issuer, credentialId);
         });
         // Isolate external function for sinon stub
         this._contractMethod = (method, parameters, overrides) => __awaiter(this, void 0, void 0, function* () {
@@ -229,22 +224,25 @@ class VcStatusRegistry {
             this._onNewBlock.next({ blockNumber });
         });
     }
-    getPastStatusSetEvents(did, fromBlock = 0, toBlock = 'latest') {
-        const filter = this.getFilter('VcStatusSet(address,address)', fromBlock, toBlock, did);
-        return this.provider.getLogs(filter);
-    }
-    getPastStatusRemoveEvents(did, fromBlock = 0, toBlock = 'latest') {
-        const filter = this.getFilter('VcStatusRemoved(address,address)', fromBlock, toBlock, did);
-        return this.provider.getLogs(filter);
-    }
-    getFilter(eventId, fromBlock, toBlock, did) {
-        return {
+    getPastStatusEvents(eventType, did, fromBlock = 0, toBlock = 'latest') {
+        let eventId;
+        switch (eventType) {
+            case 'set':
+                eventId = 'VcStatusSet(address,address)';
+                break;
+            case 'remove':
+                eventId = 'VcStatusRemoved(address,address)';
+                break;
+            default: throw new Error(`Unknown event type '${eventType}'`);
+        }
+        const filter = {
             address: this.contractAddress,
             fromBlock: fromBlock,
             toBlock: toBlock,
             // second argument is an empty array to ignore issuer did
-            topics: [eventId, [], did]
+            topics: [ethers_1.ethers.utils.id(eventId), [], did]
         };
+        return this.provider.getLogs(filter);
     }
 }
 exports.VcStatusRegistry = VcStatusRegistry;
