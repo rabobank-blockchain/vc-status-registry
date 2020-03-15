@@ -27,7 +27,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ethers_1 = require("ethers");
 exports.Wallet = ethers_1.Wallet;
 const interfaces_1 = require("./interfaces");
-exports.EventType = interfaces_1.EventType;
+exports.PastEventType = interfaces_1.PastEventType;
 const transaction_count_1 = require("./transaction-count");
 exports.TransactionCount = transaction_count_1.default;
 const rxjs_1 = require("rxjs");
@@ -166,8 +166,8 @@ class VcStatusRegistry {
             this._transactionCount = new transaction_count_1.default(this._wallet, this._options);
             this._contract = this._contract.connect(this._wallet);
         }
-        this.initiateStatusEventSubscriber(interfaces_1.EventType.set);
-        this.initiateStatusEventSubscriber(interfaces_1.EventType.remove);
+        this.initiateStatusEventSubscriber(interfaces_1.PastEventType.set);
+        this.initiateStatusEventSubscriber(interfaces_1.PastEventType.remove);
         this.initiateErrorEventSubscriber();
         this.initiateNewBlockEventSubscriber();
     }
@@ -199,17 +199,17 @@ class VcStatusRegistry {
         return this._onError;
     }
     initiateStatusEventSubscriber(eventType) {
-        const eventId = (eventType === interfaces_1.EventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)';
+        const eventId = (eventType === interfaces_1.PastEventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)';
         const statusSetFilter = {
             address: this.contractAddress,
             topics: [ethers_1.ethers.utils.id(eventId)]
         };
         this.provider.on(statusSetFilter, (result) => {
             switch (eventType) {
-                case interfaces_1.EventType.set:
+                case interfaces_1.PastEventType.set:
                     this._onSetVcStatus.next(result);
                     break;
-                case interfaces_1.EventType.remove:
+                case interfaces_1.PastEventType.remove:
                     this._onRemoveVcStatus.next(result);
                     break;
             }
@@ -226,7 +226,7 @@ class VcStatusRegistry {
         });
     }
     getPastStatusEvents(eventType, did, fromBlock = 0, toBlock = 'latest') {
-        const eventId = (eventType === interfaces_1.EventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)';
+        const eventId = (eventType === interfaces_1.PastEventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)';
         const filter = {
             address: this.contractAddress,
             fromBlock: fromBlock,

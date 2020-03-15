@@ -1,4 +1,4 @@
-# 0.2.0 / 29-02-2020
+# 0.2.0 / 15-03-2020
 
 **Breaking:**
 
@@ -22,9 +22,10 @@ VcStatusRegistryOptions {
 - Added functionality for monitoring registry status:
 
 ```json
+enum PastEventType = { set, remove }
+
 getBlockNumber(): => Promise<number>
-getPastStatusSetEvents(did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>
-getPastStatusRemoveEvents(did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>
+getPastStatusEvents(eventType: PastEventType, did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>
 
 // Observables
 onNewBlock(): Subject<NewBlockData>
@@ -32,6 +33,7 @@ onSetVcStatus(): Subject<ContractEventData>
 onRemoveVcStatus(): Subject<ContractEventData>
 onError(): Subject<any>
 ```
+
 - Updated all dependencies
 - Introduced [HISTORY.md](HISTORY.md)
 

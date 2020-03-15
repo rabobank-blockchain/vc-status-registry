@@ -40,7 +40,7 @@ export interface NewBlockData {
   blockNumber: number
 }
 
-export enum EventType {
+export enum PastEventType {
   set,
   remove
 }

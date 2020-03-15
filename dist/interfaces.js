@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var EventType;
-(function (EventType) {
-    EventType[EventType["set"] = 0] = "set";
-    EventType[EventType["remove"] = 1] = "remove";
-})(EventType = exports.EventType || (exports.EventType = {}));
+var PastEventType;
+(function (PastEventType) {
+    PastEventType[PastEventType["set"] = 0] = "set";
+    PastEventType[PastEventType["remove"] = 1] = "remove";
+})(PastEventType = exports.PastEventType || (exports.PastEventType = {}));
 //# sourceMappingURL=interfaces.js.map

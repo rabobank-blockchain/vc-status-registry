@@ -21,7 +21,7 @@ export interface ContractEventData {
 export interface NewBlockData {
     blockNumber: number;
 }
-export declare enum EventType {
+export declare enum PastEventType {
     set = 0,
     remove = 1
 }

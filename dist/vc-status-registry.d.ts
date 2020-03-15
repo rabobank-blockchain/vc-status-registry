@@ -1,5 +1,5 @@
 import { providers, Wallet } from 'ethers';
-import { VcStatusRegistryOptions, ContractEventData, NewBlockData, EventType } from './interfaces';
+import { VcStatusRegistryOptions, ContractEventData, NewBlockData, PastEventType } from './interfaces';
 import TransactionCount from './transaction-count';
 import { Subject } from 'rxjs';
 export declare class VcStatusRegistry {
@@ -38,7 +38,7 @@ export declare class VcStatusRegistry {
     private initiateErrorEventSubscriber;
     getBlockNumber: () => Promise<number>;
     private initiateNewBlockEventSubscriber;
-    getPastStatusEvents(eventType: EventType, did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>;
+    getPastStatusEvents(eventType: PastEventType, did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>;
 }
-export { Wallet, TransactionCount, VcStatusRegistryOptions, ContractEventData, NewBlockData, EventType };
+export { Wallet, TransactionCount, VcStatusRegistryOptions, ContractEventData, NewBlockData, PastEventType };
 export default VcStatusRegistry;
