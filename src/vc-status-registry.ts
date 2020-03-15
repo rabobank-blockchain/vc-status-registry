@@ -15,7 +15,7 @@
  */
 
 import { ethers, providers, Contract, Wallet } from 'ethers'
-import { VcStatusRegistryOptions, ContractEventData, NewBlockData } from './interfaces'
+import { VcStatusRegistryOptions, ContractEventData, NewBlockData, EventType } from './interfaces'
 import TransactionCount from './transaction-count'
 import { Subject } from 'rxjs'
 
@@ -138,8 +138,8 @@ export class VcStatusRegistry {
       this._transactionCount = new TransactionCount(this._wallet, this._options)
       this._contract = this._contract.connect(this._wallet)
     }
-    this.initiateStatusSetEventSubscriber()
-    this.initiateStatusRemovedEventSubscriber()
+    this.initiateStatusEventSubscriber(EventType.set)
+    this.initiateStatusEventSubscriber(EventType.remove)
     this.initiateErrorEventSubscriber()
     this.initiateNewBlockEventSubscriber()
   }
@@ -201,24 +201,17 @@ export class VcStatusRegistry {
     return this._contract[method](...parameters, overrides)
   }
 
-  private initiateStatusSetEventSubscriber () {
+  private initiateStatusEventSubscriber(eventType: EventType) {
+    const eventId = (eventType === EventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)'
     const statusSetFilter = {
       address: this.contractAddress,
-      topics: [ethers.utils.id('VcStatusSet(address,address)')]
+      topics: [ethers.utils.id(eventId)]
     }
     this.provider.on(statusSetFilter, (result) => {
-      this._onSetVcStatus.next(result as ContractEventData)
-    })
-  }
-
-  private initiateStatusRemovedEventSubscriber () {
-    const statusRemoveFilter = {
-      address: this.contractAddress,
-      topics: [ethers.utils.id('VcStatusRemoved(address,address)')]
-    }
-
-    this.provider.on(statusRemoveFilter, (result) => {
-      this._onRemoveVcStatus.next(result as ContractEventData)
+      switch (eventType) {
+        case EventType.set: this._onSetVcStatus.next(result as ContractEventData); break
+        case EventType.remove: this._onRemoveVcStatus.next(result as ContractEventData); break
+      }
     })
   }
 
@@ -239,13 +232,8 @@ export class VcStatusRegistry {
     })
   }
 
-  public getPastStatusEvents (eventType: string, did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
-    let eventId: string
-    switch (eventType) {
-      case 'set': eventId = 'VcStatusSet(address,address)'; break
-      case 'remove': eventId = 'VcStatusRemoved(address,address)'; break
-      default: throw new Error(`Unknown event type '${eventType}'`)
-    }
+  public getPastStatusEvents (eventType: EventType, did: string, fromBlock = 0, toBlock: number | string = 'latest'): Promise<Array<ContractEventData>> {
+    const eventId: string = (eventType === EventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)'
     const filter = {
       address: this.contractAddress,
       fromBlock: fromBlock,
@@ -262,6 +250,7 @@ export {
   TransactionCount,
   VcStatusRegistryOptions,
   ContractEventData,
-  NewBlockData
+  NewBlockData,
+  EventType
 }
 export default VcStatusRegistry

@@ -39,3 +39,8 @@ export interface ContractEventData {
 export interface NewBlockData {
   blockNumber: number
 }
+
+export enum EventType {
+  set,
+  remove
+}

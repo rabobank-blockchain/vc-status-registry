@@ -1,5 +1,5 @@
 import { providers, Wallet } from 'ethers';
-import { VcStatusRegistryOptions, ContractEventData, NewBlockData } from './interfaces';
+import { VcStatusRegistryOptions, ContractEventData, NewBlockData, EventType } from './interfaces';
 import TransactionCount from './transaction-count';
 import { Subject } from 'rxjs';
 export declare class VcStatusRegistry {
@@ -34,12 +34,11 @@ export declare class VcStatusRegistry {
     setVcStatus: (credentialId: string, value?: boolean) => Promise<string>;
     getVcStatus: (issuer: string, credentialId: string) => Promise<string>;
     private _contractMethod;
-    private initiateStatusSetEventSubscriber;
-    private initiateStatusRemovedEventSubscriber;
+    private initiateStatusEventSubscriber;
     private initiateErrorEventSubscriber;
     getBlockNumber: () => Promise<number>;
     private initiateNewBlockEventSubscriber;
-    getPastStatusEvents(eventType: string, did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>;
+    getPastStatusEvents(eventType: EventType, did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>;
 }
-export { Wallet, TransactionCount, VcStatusRegistryOptions, ContractEventData, NewBlockData };
+export { Wallet, TransactionCount, VcStatusRegistryOptions, ContractEventData, NewBlockData, EventType };
 export default VcStatusRegistry;

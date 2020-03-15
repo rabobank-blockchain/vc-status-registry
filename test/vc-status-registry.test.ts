@@ -18,7 +18,7 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as chaiAsPromised from 'chai-as-promised'
 import * as sinonChai from 'sinon-chai'
-import { VcStatusRegistry, Wallet, TransactionCount, NewBlockData, ContractEventData } from '../src/vc-status-registry'
+import { VcStatusRegistry, Wallet, TransactionCount, NewBlockData, ContractEventData, EventType } from '../src/vc-status-registry'
 import { ethers } from 'ethers'
 
 const assert = chai.assert
@@ -435,6 +435,7 @@ describe('Test vcStatusRegistry functionality', () => {
       assert.deepEqual(returnData, providerData)
     },1)
   })
+
   it('should forward the event when RemoveVcStatus happens on the contract', async () => {
     const providerData = {
       blockNumber: 12,
@@ -502,7 +503,7 @@ describe('Test vcStatusRegistry functionality', () => {
       transactionHash: '2',
       logIndex: 1
     }]))
-    const pastEvents = await vcStatusRegistry.getPastStatusEvents('set', 'did', 1, 2)
+    const pastEvents = await vcStatusRegistry.getPastStatusEvents(EventType.set, 'did', 1, 2)
     assert.equal(pastEvents.length, 1)
     assert.isTrue(sinonStub.calledWithExactly({
       address: contractAddress,
@@ -525,7 +526,7 @@ describe('Test vcStatusRegistry functionality', () => {
       transactionHash: '2',
       logIndex: 1
     }]))
-    const pastEvents = await vcStatusRegistry.getPastStatusEvents('set', 'did')
+    const pastEvents = await vcStatusRegistry.getPastStatusEvents(EventType.set, 'did')
     assert.equal(pastEvents.length, 1)
     assert.isTrue(sinonStub.calledWithExactly({
       address: contractAddress,
@@ -548,7 +549,7 @@ describe('Test vcStatusRegistry functionality', () => {
       transactionHash: '2',
       logIndex: 1
     }]))
-    const pastEvents = await vcStatusRegistry.getPastStatusEvents('remove', 'did')
+    const pastEvents = await vcStatusRegistry.getPastStatusEvents(EventType.remove, 'did')
     assert.equal(pastEvents.length, 1)
     assert.isTrue(sinonStub.calledWithExactly({
       address: contractAddress,
