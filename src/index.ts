@@ -14,33 +14,6 @@
  * limitations under the License.
  */
 
-/**
- * Override Ethereum gas options
- */
-export interface VcStatusRegistryOptions {
-  gasLimit?: number
-  gasPrice?: number
-  txNonceMaxRaceCount?: number
-  txNonceMaxIdleTime?: number
-}
-
-export interface ContractEventData {
-  blockNumber: number
-  blockHash: string
-  transactionIndex: number
-  removed: boolean
-  address: string
-  data: string
-  topics: string[]
-  transactionHash: string
-  logIndex: number
-}
-
-export interface NewBlockData {
-  blockNumber: number
-}
-
-export enum PastEventType {
-  set,
-  remove
-}
+export { VcStatusRegistry } from './vc-status-registry'
+export { TransactionCount } from './transaction-count'
+export { VcStatusRegistryOptions, ContractEventData, NewBlockData, PastEventType } from './interfaces'

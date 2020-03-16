@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Coöperatieve Rabobank U.A.
+ * Copyright 2020 Coöperatieve Rabobank U.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import { ethers, providers, Contract, Wallet } from 'ethers'
 import { VcStatusRegistryOptions, ContractEventData, NewBlockData, PastEventType } from './interfaces'
-import TransactionCount from './transaction-count'
+import { TransactionCount } from '.'
 import { Subject } from 'rxjs'
 
 const ABI = [
@@ -244,13 +244,3 @@ export class VcStatusRegistry {
     return this.provider.getLogs(filter) as Promise<Array<ContractEventData>>
   }
 }
-
-export {
-  Wallet,
-  TransactionCount,
-  VcStatusRegistryOptions,
-  ContractEventData,
-  NewBlockData,
-  PastEventType
-}
-export default VcStatusRegistry

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Coöperatieve Rabobank U.A.
+ * Copyright 2020 Coöperatieve Rabobank U.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import { Wallet } from 'ethers'
 import { VcStatusRegistryOptions } from './interfaces'
 
-class TransactionCount {
+export class TransactionCount {
   /**
    * currentTransaction holds the last transactionCount
    * Race conditions might occur. try to manage:
@@ -56,5 +56,3 @@ class TransactionCount {
     }
   }
 }
-
-export default TransactionCount
