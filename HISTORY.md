@@ -25,7 +25,7 @@ The function `setVcStatus` can now be called with an extra (optional) parameter 
 setVcStatus(credentialId: string, value: boolean = true): Promise<string>
 // false = make the credential invalid
 ```
- 
+
 **Enhancements:**
 
 - Added functionality for monitoring registry status:
@@ -37,10 +37,10 @@ getBlockNumber(): => Promise<number>
 getPastStatusEvents(eventType: PastEventType, did: string, fromBlock?: number, toBlock?: number | string): Promise<Array<ContractEventData>>
 
 // Observables
-onNewBlock(): Subject<NewBlockData>
-onSetVcStatus(): Subject<ContractEventData>
-onRemoveVcStatus(): Subject<ContractEventData>
-onError(): Subject<any>
+onNewBlock(): Observable<NewBlockData>
+onSetVcStatus(): Observable<ContractEventData>
+onRemoveVcStatus(): Observable<ContractEventData>
+onError(): Observable<any>
 ```
 
 - Added `ABI` getter

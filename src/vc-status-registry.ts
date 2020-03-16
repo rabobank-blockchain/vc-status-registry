@@ -17,7 +17,7 @@
 import { ethers, providers, Contract, Wallet } from 'ethers'
 import { VcStatusRegistryOptions, ContractEventData, NewBlockData, PastEventType } from './interfaces'
 import { TransactionCount } from '.'
-import { Subject } from 'rxjs'
+import { Observable, Subject } from 'rxjs'
 
 const ABI = require('./ABI.json')
 
@@ -78,16 +78,16 @@ export class VcStatusRegistry {
     return ABI
   }
 
-  get onNewBlock (): Subject<NewBlockData> {
+  get onNewBlock (): Observable<NewBlockData> {
     return this._onNewBlock
   }
-  get onSetVcStatus (): Subject<ContractEventData> {
+  get onSetVcStatus (): Observable<ContractEventData> {
     return this._onSetVcStatus
   }
-  get onRemoveVcStatus (): Subject<ContractEventData> {
+  get onRemoveVcStatus (): Observable<ContractEventData> {
     return this._onRemoveVcStatus
   }
-  get onError (): Subject<any> {
+  get onError (): Observable<any> {
     return this._onError
   }
 
