@@ -3,10 +3,11 @@
 **Breaking:**
 
 - Switch from web3 to ethers.js lib
-- `web3` removed from the interface
-- web3 object `account` replaced by ethers.js object `wallet`
-- Some optional parameters `gasMultiplier`, `gasPriceMax` for gas management have been replaced by `gasPrice`
-- Some optional parameters `txNonceMaxRaceCount` and `txNonceMaxIdleTime` for nonce management have been added. The VcStatusRegistryOptions object is now defined as follows:
+- `web3` getter was removed, added `provider` getter instead
+- `account` getter replaced by `wallet` (from ethers.js)
+- `VcStatusRegistry` is no longer a default export
+- Replaced optional constructor parameters `gasMultiplier`, `gasPriceMax` by `gasPrice`
+- Added optional parameters `txNonceMaxRaceCount` and `txNonceMaxIdleTime` for nonce management. The VcStatusRegistryOptions object is now defined as follows:
 
 ```json
 VcStatusRegistryOptions {
@@ -17,10 +18,12 @@ VcStatusRegistryOptions {
 }
 ```
 
-- Better coding practices (preventing duplicate code blocks) let to the decision to integrate the `removeVcStatus` function into `setVcStatus`. The function `setVcStatus` can now be called with an extra (optional) parameter `true` or `false`, setting the status of the credential accordingly:
+- `removeVcStatus` function merged into `setVcStatus`.
+The function `setVcStatus` can now be called with an extra (optional) parameter `true` or `false`, setting the status of the credential accordingly:
 
 ```
 setVcStatus(credentialId: string, value: boolean = true): Promise<string>
+// false = make the credential invalid
 ```
  
 **Enhancements:**
@@ -40,6 +43,7 @@ onRemoveVcStatus(): Subject<ContractEventData>
 onError(): Subject<any>
 ```
 
+- Added `ABI` getter
 - Updated all dependencies
 - Introduced [HISTORY.md](HISTORY.md)
 
