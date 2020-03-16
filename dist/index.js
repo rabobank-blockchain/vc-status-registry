@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var PastEventType;
-(function (PastEventType) {
-    PastEventType[PastEventType["set"] = 0] = "set";
-    PastEventType[PastEventType["remove"] = 1] = "remove";
-})(PastEventType = exports.PastEventType || (exports.PastEventType = {}));
-//# sourceMappingURL=interfaces.js.map
+var vc_status_registry_1 = require("./vc-status-registry");
+exports.VcStatusRegistry = vc_status_registry_1.VcStatusRegistry;
+var transaction_count_1 = require("./transaction-count");
+exports.TransactionCount = transaction_count_1.TransactionCount;
+var interfaces_1 = require("./interfaces");
+exports.PastEventType = interfaces_1.PastEventType;
+//# sourceMappingURL=index.js.map

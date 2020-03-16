@@ -1,6 +1,6 @@
 import { Wallet } from 'ethers';
 import { VcStatusRegistryOptions } from './interfaces';
-declare class TransactionCount {
+export declare class TransactionCount {
     private readonly _wallet;
     private readonly _options;
     /**
@@ -17,4 +17,3 @@ declare class TransactionCount {
     constructor(_wallet: Wallet, _options?: VcStatusRegistryOptions);
     transactionCount: () => Promise<number>;
 }
-export default TransactionCount;

@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Copyright 2019 Coöperatieve Rabobank U.A.
+ * Copyright 2020 Coöperatieve Rabobank U.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,116 +15,26 @@
  * limitations under the License.
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ethers_1 = require("ethers");
-exports.Wallet = ethers_1.Wallet;
 const interfaces_1 = require("./interfaces");
-exports.PastEventType = interfaces_1.PastEventType;
-const transaction_count_1 = require("./transaction-count");
-exports.TransactionCount = transaction_count_1.default;
+const _1 = require(".");
 const rxjs_1 = require("rxjs");
-const ABI = [
-    {
-        'constant': false,
-        'inputs': [
-            {
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'setVcStatus',
-        'outputs': [],
-        'payable': false,
-        'stateMutability': 'nonpayable',
-        'type': 'function'
-    },
-    {
-        'constant': false,
-        'inputs': [
-            {
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'removeVcStatus',
-        'outputs': [],
-        'payable': false,
-        'stateMutability': 'nonpayable',
-        'type': 'function'
-    },
-    {
-        'constant': true,
-        'inputs': [
-            {
-                'name': 'issuer',
-                'type': 'address'
-            },
-            {
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'getVcStatus',
-        'outputs': [
-            {
-                'name': '',
-                'type': 'bool'
-            }
-        ],
-        'payable': false,
-        'stateMutability': 'view',
-        'type': 'function'
-    },
-    {
-        'anonymous': false,
-        'inputs': [
-            {
-                'indexed': true,
-                'name': 'issuer',
-                'type': 'address'
-            },
-            {
-                'indexed': true,
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'VcStatusSet',
-        'type': 'event'
-    },
-    {
-        'anonymous': false,
-        'inputs': [
-            {
-                'indexed': true,
-                'name': 'issuer',
-                'type': 'address'
-            },
-            {
-                'indexed': true,
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'VcStatusRemoved',
-        'type': 'event'
-    }
-];
+const ABI = require('./ABI.json');
 class VcStatusRegistry {
     /**
      * @constructor Will set up the connection to an ethereum provider with provided credentials.
-     * @param ethereumProvider connection string
-     * @param contractAddress address of the contract '0x...'
+     * @param _ethereumProvider connection string
+     * @param _contractAddress address of the contract '0x...'
      * @param privateKey optional, private key for issuing credentials
-     * @param options optional, see VcStatusRegistryOptions
+     * @param _options optional, see VcStatusRegistryOptions
      */
     constructor(_ethereumProvider, _contractAddress, privateKey, _options = {}) {
         this._ethereumProvider = _ethereumProvider;
@@ -163,7 +73,7 @@ class VcStatusRegistry {
         this._contract = new ethers_1.ethers.Contract(this._contractAddress, ABI, this._provider);
         if (privateKey) {
             this._wallet = new ethers_1.ethers.Wallet(Buffer.from(privateKey, 'hex'), this._provider);
-            this._transactionCount = new transaction_count_1.default(this._wallet, this._options);
+            this._transactionCount = new _1.TransactionCount(this._wallet, this._options);
             this._contract = this._contract.connect(this._wallet);
         }
         this.initiateStatusEventSubscriber(interfaces_1.PastEventType.set);
@@ -238,5 +148,4 @@ class VcStatusRegistry {
     }
 }
 exports.VcStatusRegistry = VcStatusRegistry;
-exports.default = VcStatusRegistry;
 //# sourceMappingURL=vc-status-registry.js.map
