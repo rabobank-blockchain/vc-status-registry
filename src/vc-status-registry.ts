@@ -22,7 +22,7 @@ import { Subject } from 'rxjs'
 const ABI = require('./ABI.json')
 
 export class VcStatusRegistry {
-  private _provider: providers.JsonRpcProvider
+  private readonly _provider: providers.JsonRpcProvider
   private readonly _wallet: Wallet | undefined
   private readonly _contract: Contract
   private _transactionCount: TransactionCount | undefined
@@ -33,10 +33,10 @@ export class VcStatusRegistry {
 
   /**
    * @constructor Will set up the connection to an ethereum provider with provided credentials.
-   * @param ethereumProvider connection string
-   * @param contractAddress address of the contract '0x...'
+   * @param _ethereumProvider connection string
+   * @param _contractAddress address of the contract '0x...'
    * @param privateKey optional, private key for issuing credentials
-   * @param options optional, see VcStatusRegistryOptions
+   * @param _options optional, see VcStatusRegistryOptions
    */
   constructor (
     private readonly _ethereumProvider: string,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Coöperatieve Rabobank U.A.
+ * Copyright 2020 Coöperatieve Rabobank U.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as chaiAsPromised from 'chai-as-promised'
 import * as sinonChai from 'sinon-chai'
-import { VcStatusRegistry, Wallet, TransactionCount, NewBlockData, ContractEventData, PastEventType } from '../src/vc-status-registry'
-import { ethers } from 'ethers'
+import { ethers, Wallet } from 'ethers'
+import { TransactionCount, ContractEventData, NewBlockData, PastEventType, VcStatusRegistry } from '../src'
 
 const assert = chai.assert
 
@@ -85,7 +85,7 @@ describe('Test vcStatusRegistry functionality', () => {
       provider,
       contractAddress
     )
-    const stubContractMethod = sinon
+    sinon
       .stub((vcStatusRegistry as any), '_contractMethod')
       .returns(Promise.resolve({ hash: 'dude' }))
 
@@ -227,7 +227,7 @@ describe('Test vcStatusRegistry functionality', () => {
   )
 
   it('should throw if setVcStatus is called without privateKey', async () => {
-    const stubContractMethod = sinon
+    sinon
       .stub(vcStatusRegistry as any, '_contractMethod')
       .returns(Promise.resolve({ hash: 'dude' }))
     sinon
