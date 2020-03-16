@@ -13,7 +13,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf ./dist",
-    "compile": "./node_modules/.bin/tsc",
+    "compile": "./node_modules/.bin/tsc && cp ./src/ABI.json ./dist",
     "prepublishOnly": "npm run clean && npm run compile && npm run lint && npm run test",
     "test": "./node_modules/.bin/nyc --check-coverage --lines 80 ./node_modules/.bin/mocha \"test/**/*.test.ts\" --exit",
     "stryker": "./node_modules/.bin/stryker run",
