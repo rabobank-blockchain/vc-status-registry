@@ -177,7 +177,7 @@ export class VcStatusRegistry {
     return this._onError
   }
 
-  public setVcStatus = async (credentialId: string, value = true): Promise<string> => {
+  public setVcStatus = async (credentialId: string, value: boolean = true): Promise<string> => {
     const method = value ? 'setVcStatus' : 'removeVcStatus'
     if (!this._wallet) {
       throw (new Error(`Error: Can not call "${method}" without privateKey`))

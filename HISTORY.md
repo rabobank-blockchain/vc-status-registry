@@ -17,6 +17,12 @@ VcStatusRegistryOptions {
 }
 ```
 
+- Better coding practices (preventing duplicate code blocks) let to the decision to integrate the `removeVcStatus` function into `setVcStatus`. The function `setVcStatus` can now be called with an extra (optional) parameter `true` or `false`, setting the status of the credential accordingly:
+
+```
+setVcStatus(credentialId: string, value: boolean = true): Promise<string>
+```
+ 
 **Enhancements:**
 
 - Added functionality for monitoring registry status:
