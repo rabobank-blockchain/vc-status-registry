@@ -25,7 +25,6 @@ npm install vc-status-registry --save
 import VcStatusRegistry from 'vc-status-registry'
 
 const privateKey = '53fd2ebe003d072fe914a90581b8d36964f2392ede2fab9618d4492cff85f35d' // Issuer private key
-const address = '0xac9E10ab57f6DcDad1bA0C634EdCAE25116F5dab' // Issuer address
 const contractAddress = '0xe9fdf8130ad68fd11d195fb1e49a479e30b6d3d4' // VC Status Registry smart contract address
 const provider = 'https://rinkeby.infura.io'
 
@@ -47,7 +46,7 @@ const credentialId = '0x72d3bc4da6e025540edbfee8b376918f95ec59e4' // The address
   console.log('status:', credentialIdStatus) // "true" if active or "false" if revoked or never registered
 
   // Remove a credential using 'privateKey/address'
-  await vcStatusRegistry.removeVcStatus(credentialId)
+  await vcStatusRegistry.setVcStatus(credentialId, false)
 
 })()
 ```
