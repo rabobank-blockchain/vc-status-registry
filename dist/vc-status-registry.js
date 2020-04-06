@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Copyright 2019 Coöperatieve Rabobank U.A.
+ * Copyright 2020 Coöperatieve Rabobank U.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,168 +23,63 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Web3 = require("web3");
-const EthTx = require("ethereumjs-tx");
-const DEFAULT_GAS_MULTIPLIER = 100000;
-const DEFAULT_GAS_PRICE_MAX = 100000000000;
-const DEFAULT_GAS_LIMIT = 300000;
-const DEFAULT_ABI = [
-    {
-        'constant': false,
-        'inputs': [
-            {
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'setVcStatus',
-        'outputs': [],
-        'payable': false,
-        'stateMutability': 'nonpayable',
-        'type': 'function'
-    },
-    {
-        'constant': false,
-        'inputs': [
-            {
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'removeVcStatus',
-        'outputs': [],
-        'payable': false,
-        'stateMutability': 'nonpayable',
-        'type': 'function'
-    },
-    {
-        'constant': true,
-        'inputs': [
-            {
-                'name': 'issuer',
-                'type': 'address'
-            },
-            {
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'getVcStatus',
-        'outputs': [
-            {
-                'name': '',
-                'type': 'bool'
-            }
-        ],
-        'payable': false,
-        'stateMutability': 'view',
-        'type': 'function'
-    },
-    {
-        'anonymous': false,
-        'inputs': [
-            {
-                'indexed': true,
-                'name': 'issuer',
-                'type': 'address'
-            },
-            {
-                'indexed': true,
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'VcStatusSet',
-        'type': 'event'
-    },
-    {
-        'anonymous': false,
-        'inputs': [
-            {
-                'indexed': true,
-                'name': 'issuer',
-                'type': 'address'
-            },
-            {
-                'indexed': true,
-                'name': 'credentialId',
-                'type': 'address'
-            }
-        ],
-        'name': 'VcStatusRemoved',
-        'type': 'event'
-    }
-];
+const ethers_1 = require("ethers");
+const interfaces_1 = require("./interfaces");
+const _1 = require(".");
+const rxjs_1 = require("rxjs");
+const ABI = require('./ABI.json');
 class VcStatusRegistry {
     /**
      * @constructor Will set up the connection to an ethereum provider with provided credentials.
-     * @param ethereumProvider connection string
-     * @param contractAddress address of the contract '0x...'
+     * @param _ethereumProvider connection string
+     * @param _contractAddress address of the contract '0x...'
      * @param privateKey optional, private key for issuing credentials
-     * @param options optional, see VcStatusRegistryOptions
+     * @param _options optional, see VcStatusRegistryOptions
      */
-    constructor(ethereumProvider, contractAddress, privateKey, options = {}) {
-        this.setVcStatus = (credentialId) => {
-            return this.sendSignedTransaction('setVcStatus', [credentialId]);
-        };
-        this.removeVcStatus = (credentialId) => {
-            return this.sendSignedTransaction('removeVcStatus', [credentialId]);
-        };
-        this.getVcStatus = (issuer, credentialId) => {
-            return this._contract.methods.getVcStatus(issuer, credentialId).call();
-        };
-        this.pickDefault = function (obj1, obj2) {
-            return (typeof (obj1) === 'undefined') ? obj2 : obj1;
-        };
-        this.sendSignedTransaction = (method, parameters) => __awaiter(this, void 0, void 0, function* () {
-            if (!this._account.privateKey) {
+    constructor(_ethereumProvider, _contractAddress, privateKey, _options = {}) {
+        this._ethereumProvider = _ethereumProvider;
+        this._contractAddress = _contractAddress;
+        this._options = _options;
+        this._onNewBlock = new rxjs_1.Subject();
+        this._onSetVcStatus = new rxjs_1.Subject();
+        this._onRemoveVcStatus = new rxjs_1.Subject();
+        this._onError = new rxjs_1.Subject();
+        this.setVcStatus = (credentialId, value = true) => __awaiter(this, void 0, void 0, function* () {
+            const method = value ? 'setVcStatus' : 'removeVcStatus';
+            if (!this._wallet) {
                 throw (new Error(`Error: Can not call "${method}" without privateKey`));
             }
-            const contractMethod = this._contract.methods[method](...parameters);
-            const data = contractMethod.encodeABI();
-            const [gas, nonce] = yield Promise.all([
-                contractMethod.estimateGas(),
-                this._transactionCount.transactionCount()
-            ]);
-            const rawTx = {
-                nonce: this._web3.utils.toHex(nonce),
-                gasPrice: this._web3.utils.toHex(Math.min(gas * this._gasMultiplier, this._gasPriceMax)),
-                gasLimit: this._web3.utils.toHex(this._gasLimit),
-                to: this._contractAddress,
-                value: '0x00',
-                data
+            const nonce = yield this._transactionCount.transactionCount();
+            const overrides = {
+                nonce: nonce,
+                gasPrice: this._options.gasPrice,
+                gasLimit: this._options.gasLimit
             };
-            const ethTx = new EthTx(rawTx);
-            const privateKey = this._account.privateKey;
-            ethTx.sign(Buffer.from(privateKey.slice(2), 'hex'));
-            const serializedTx = ethTx.serialize();
-            return this._sendSignedTransaction('0x' + serializedTx.toString('hex'));
+            const txResponse = yield this._contractMethod(method, [credentialId], overrides);
+            return txResponse.hash;
         });
-        // Wrap this function, so it can be stubbed using sinon
-        this._sendSignedTransaction = (serializedTx) => {
-            return new Promise((resolve, reject) => {
-                this._web3.eth.sendSignedTransaction(serializedTx)
-                    .once('transactionHash', txHash => {
-                    resolve(txHash);
-                })
-                    .once('error', error => {
-                    reject(error);
-                });
-            });
-        };
-        this._ethereumProvider = ethereumProvider;
-        this._contractAddress = contractAddress;
-        this._web3 = new Web3(Web3.givenProvider || this._ethereumProvider);
-        this._account = {};
+        this.getVcStatus = (issuer, credentialId) => __awaiter(this, void 0, void 0, function* () {
+            return this._contract.getVcStatus(issuer, credentialId);
+        });
+        // Isolate external function for sinon stub
+        this._contractMethod = (method, parameters, overrides) => __awaiter(this, void 0, void 0, function* () {
+            return this._contract[method](...parameters, overrides);
+        });
+        // Probably remove since they are convenience methods, should live in a separate class
+        this.getBlockNumber = () => __awaiter(this, void 0, void 0, function* () {
+            return this.provider.getBlockNumber();
+        });
+        this._provider = new ethers_1.ethers.providers.JsonRpcProvider(this._ethereumProvider);
+        this._contract = new ethers_1.ethers.Contract(this._contractAddress, ABI, this._provider);
         if (privateKey) {
-            this._account = this._web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
-            this._transactionCount = new TransactionCount(this._web3, this._account.address);
+            this._wallet = new ethers_1.ethers.Wallet(Buffer.from(privateKey, 'hex'), this._provider);
+            this._transactionCount = new _1.TransactionCount(this._wallet, this._options);
+            this._contract = this._contract.connect(this._wallet);
         }
-        this._gasMultiplier = this.pickDefault(options.gasMultiplier, DEFAULT_GAS_MULTIPLIER);
-        this._gasLimit = this.pickDefault(options.gasLimit, DEFAULT_GAS_LIMIT);
-        this._gasPriceMax = this.pickDefault(options.gasPriceMax, DEFAULT_GAS_PRICE_MAX);
-        this._ABI = DEFAULT_ABI;
-        this._contract = new this._web3.eth.Contract(this._ABI, this._contractAddress);
+        this.initiateStatusEventSubscriber(interfaces_1.PastEventType.set);
+        this.initiateStatusEventSubscriber(interfaces_1.PastEventType.remove);
+        this.initiateErrorEventSubscriber();
+        this.initiateNewBlockEventSubscriber();
     }
     get ethereumProvider() {
         return this._ethereumProvider;
@@ -192,51 +87,65 @@ class VcStatusRegistry {
     get contractAddress() {
         return this._contractAddress;
     }
-    get web3() {
-        return this._web3;
+    get provider() {
+        return this._provider;
     }
-    get account() {
-        return this._account;
+    get wallet() {
+        return this._wallet;
+    }
+    get ABI() {
+        return ABI;
+    }
+    get onNewBlock() {
+        return this._onNewBlock;
+    }
+    get onSetVcStatus() {
+        return this._onSetVcStatus;
+    }
+    get onRemoveVcStatus() {
+        return this._onRemoveVcStatus;
+    }
+    get onError() {
+        return this._onError;
+    }
+    initiateStatusEventSubscriber(eventType) {
+        const eventId = (eventType === interfaces_1.PastEventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)';
+        const statusSetFilter = {
+            address: this.contractAddress,
+            topics: [ethers_1.ethers.utils.id(eventId)]
+        };
+        this.provider.on(statusSetFilter, (result) => {
+            switch (eventType) {
+                case interfaces_1.PastEventType.set:
+                    this._onSetVcStatus.next(result);
+                    break;
+                case interfaces_1.PastEventType.remove:
+                    this._onRemoveVcStatus.next(result);
+                    break;
+            }
+        });
+    }
+    initiateErrorEventSubscriber() {
+        this.provider.on('error', (error) => {
+            this._onError.next(error);
+        });
+    }
+    initiateNewBlockEventSubscriber() {
+        this.provider.on('block', (blockNumber) => {
+            this._onNewBlock.next({ blockNumber });
+        });
+    }
+    getPastStatusEvents(eventType, did, fromBlock = 0, toBlock = 'latest') {
+        const eventId = (eventType === interfaces_1.PastEventType.set) ? 'VcStatusSet(address,address)' : 'VcStatusRemoved(address,address)';
+        const filter = {
+            address: this.contractAddress,
+            fromBlock: fromBlock,
+            toBlock: toBlock,
+            // second argument is an empty array to ignore issuer did
+            topics: [ethers_1.ethers.utils.id(eventId), [], did]
+        };
+        return this.provider.getLogs(filter);
     }
 }
 exports.VcStatusRegistry = VcStatusRegistry;
-class TransactionCount {
-    constructor(web3, address) {
-        /**
-         * currentTransaction holds the last transactionCount
-         * Race conditions might occur. try to manage:
-         * - transactionNr missed. reset if raceCount > maxRaceCount
-         * - idle for some time. reset if lastTxTime > maxIdleTime
-         * In the future you might want to handle this completely different by keeping
-         * track of all open requests
-         */
-        this._currentTransaction = 0;
-        this._raceCount = 0;
-        this._lastTxTime = 0;
-        this.transactionCount = () => __awaiter(this, void 0, void 0, function* () {
-            const maxRaceCount = 100;
-            const maxIdleTime = 30 * 1000; // Make sure to skip at least 1 block
-            const now = new Date().valueOf(); // Time in miliseconds since 1970
-            const nonce = yield this._web3.eth.getTransactionCount(this._address);
-            if ((nonce > this._currentTransaction) ||
-                (this._raceCount > maxRaceCount) ||
-                ((now - this._lastTxTime) > maxIdleTime)) {
-                // Normal situation
-                this._raceCount = 0;
-                this._lastTxTime = now;
-                this._currentTransaction = nonce;
-                return this._currentTransaction;
-            }
-            else {
-                // We might be racing. Add one more transaction
-                this._raceCount++;
-                this._lastTxTime = now;
-                return ++this._currentTransaction;
-            }
-        });
-        this._web3 = web3;
-        this._address = address;
-    }
-}
-exports.default = VcStatusRegistry;
 //# sourceMappingURL=vc-status-registry.js.map

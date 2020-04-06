@@ -1,0 +1,87 @@
+[
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "credentialId",
+        "type": "address"
+      }
+    ],
+    "name": "setVcStatus",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "credentialId",
+        "type": "address"
+      }
+    ],
+    "name": "removeVcStatus",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "name": "credentialId",
+        "type": "address"
+      }
+    ],
+    "name": "getVcStatus",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "credentialId",
+        "type": "address"
+      }
+    ],
+    "name": "VcStatusSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "credentialId",
+        "type": "address"
+      }
+    ],
+    "name": "VcStatusRemoved",
+    "type": "event"
+  }
+]

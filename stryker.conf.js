@@ -8,13 +8,14 @@ module.exports = function (config) {
     tsconfigFile: 'tsconfig.json',
     mutate: ['src/**/*.ts'],
     mochaOptions: {
-      files: [
-        'test/**/*.test.ts']
+      spec: ['test/**/*.ts'],
+      config: '.mocharc.json',
+      package: 'package.json'
     },
     thresholds: {
       high: 100,
       low: 90,
-      break: 60
+      break: 80
     }
   })
 }

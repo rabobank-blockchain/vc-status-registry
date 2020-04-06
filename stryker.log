@@ -1,0 +1,490 @@
+15:29:40 (41752) INFO ConfigReader Using stryker.conf.js
+15:29:40 (41752) DEBUG BroadcastReporter Broadcasting to reporters ["html","clear-text","progress"]
+15:29:40 (41752) DEBUG ConfigReader Loading config /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js
+15:29:40 (41752) DEBUG ConfigReader Loaded config: {
+  "mutate": [
+    "src/**/*.ts"
+  ],
+  "logLevel": "debug",
+  "fileLogLevel": "trace",
+  "timeoutMS": 5000,
+  "timeoutFactor": 1.5,
+  "plugins": [
+    "@stryker-mutator/*"
+  ],
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress"
+  ],
+  "coverageAnalysis": "off",
+  "testRunner": "mocha",
+  "mutator": "typescript",
+  "transpilers": [],
+  "maxConcurrentTestRunners": null,
+  "symlinkNodeModules": true,
+  "thresholds": {
+    "high": 100,
+    "low": 90,
+    "break": 80
+  },
+  "allowConsoleColors": true,
+  "dashboard": {
+    "baseUrl": "https://dashboard.stryker-mutator.io/api/reports",
+    "reportType": "full"
+  },
+  "tempDirName": ".stryker-tmp",
+  "packageManager": "npm",
+  "tsconfigFile": "tsconfig.json",
+  "mochaOptions": {
+    "files": [
+      "test/**/*.test.ts"
+    ]
+  },
+  "configFile": "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js"
+}
+15:29:40 (41752) DEBUG PluginLoader Loading @stryker-mutator/* from /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator
+15:29:40 (41752) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner" (matched with expression @stryker-mutator/*)
+15:29:40 (41752) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript" (matched with expression @stryker-mutator/*)
+15:29:40 (41752) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner
+15:29:40 (41752) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript
+15:29:40 (41752) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/reporters/index.js
+15:29:40 (41752) DEBUG MochaOptionsLoader Mocha >= 6 detected. Using mocha's `loadOptions` to load mocha options
+15:29:40 (41752) TRACE MochaOptionsLoader Mocha: loadOptions(['--files','test/**/*.test.ts']) => {"_":[],"diff":true,"files":"test/**/*.test.ts","config":false,"package":false,"opts":false,"extension":["js","cjs","mjs"],"reporter":"spec","R":"spec","slow":75,"s":75,"timeout":2000,"t":2000,"timeouts":2000,"ui":"bdd","u":"bdd","watch-ignore":["node_modules",".git"]}
+15:29:40 (41752) DEBUG MochaOptionsLoader Loaded options: {
+  "extension": [
+    "js",
+    "cjs",
+    "mjs"
+  ],
+  "timeout": 2000,
+  "ui": "bdd"
+}
+15:29:40 (41752) INFO TypescriptConfigEditor Loading tsconfig file /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tsconfig.json
+15:29:40 (41752) INFO InputFileResolver Found 4 of 33 file(s) to be mutated.
+15:29:40 (41752) DEBUG InputFileResolver All input files: [
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.log",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/test/.mocharc.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.gitignore",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.nycrc",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.travis.yml",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/HISTORY.md",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/LICENSE",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/NOTICE",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/README.md",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/index.d.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/index.js",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/index.js.map",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/interfaces.d.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/interfaces.js",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/interfaces.js.map",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/transaction-count.d.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/transaction-count.js",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/transaction-count.js.map",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/vc-status-registry.d.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/vc-status-registry.js",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/dist/vc-status-registry.js.map",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/package-lock.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/package.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/ABI.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/VcStatusRegistry.sol",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/index.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/interfaces.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/transaction-count.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/vc-status-registry.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/test/vc-status-registry.test.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tsconfig.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tslint.json"
+]
+15:29:40 (41752) DEBUG InputFileResolver Files to mutate: [
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/index.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/interfaces.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/transaction-count.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/vc-status-registry.ts"
+]
+15:29:40 (41752) DEBUG TemporaryDirectory Using temp directory "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp"
+15:29:40 (41752) DEBUG TestFrameworkOrchestrator The `coverageAnalysis` setting is "off", not hooking into the test framework to achieve performance benefits.
+15:29:40 (41752) INFO InitialTestExecutor Starting initial test run. This may take a while.
+15:29:40 (41752) DEBUG Sandbox Creating a sandbox for files in /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp/sandbox1729785
+15:29:40 (41752) DEBUG Sandbox Creating test runner 0
+15:29:40 (41752) DEBUG ChildProcessProxy Starting /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/test-runner/ChildProcessTestRunnerWorker.js in child process 41755
+15:29:40 (41755) DEBUG ChildProcessProxyWorker Changing current working directory for this process to /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp/sandbox1729785
+15:29:40 (41755) DEBUG PluginLoader Loading @stryker-mutator/* from /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator
+15:29:40 (41755) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner" (matched with expression @stryker-mutator/*)
+15:29:40 (41755) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript" (matched with expression @stryker-mutator/*)
+15:29:40 (41755) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner
+15:29:40 (41755) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript
+15:29:41 (41755) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/reporters/index.js
+15:29:41 (41755) DEBUG MochaTestRunner Mocha >= 6 detected. Using mocha's `handleFiles` to load files
+15:29:41 (41752) TRACE ChildProcessProxy [31mError: No test files found[39m
+
+15:29:41 (41752) DEBUG TimeoutDecorator Starting timeout timer (300000 ms) for a test run
+15:29:41 (41755) DEBUG MochaTestRunner Starting Mocha test run
+15:29:41 (41755) DEBUG MochaTestRunner Mocha test run completed: 0/0 passed
+15:29:41 (41752) DEBUG ChildProcessProxy Disposing of worker process 41755
+15:29:41 (41752) DEBUG ChildProcessProxy Kill 41755
+15:29:41 (41752) WARN InitialTestExecutor No tests were executed. Stryker will exit prematurely. Please check your configuration.
+15:29:41 (41752) INFO MutatorFacade 85 Mutant(s) generated
+16:35:23 (53233) INFO ConfigReader Using stryker.conf.js
+16:35:23 (53233) DEBUG BroadcastReporter Broadcasting to reporters ["html","clear-text","progress"]
+16:35:23 (53233) DEBUG ConfigReader Loading config /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js
+16:35:23 (53233) DEBUG ConfigReader Loaded config: {
+  "mutate": [
+    "src/**/*.ts"
+  ],
+  "logLevel": "debug",
+  "fileLogLevel": "trace",
+  "timeoutMS": 5000,
+  "timeoutFactor": 1.5,
+  "plugins": [
+    "@stryker-mutator/*"
+  ],
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress"
+  ],
+  "coverageAnalysis": "off",
+  "testRunner": "mocha",
+  "mutator": "typescript",
+  "transpilers": [],
+  "maxConcurrentTestRunners": null,
+  "symlinkNodeModules": true,
+  "thresholds": {
+    "high": 100,
+    "low": 90,
+    "break": 80
+  },
+  "allowConsoleColors": true,
+  "dashboard": {
+    "baseUrl": "https://dashboard.stryker-mutator.io/api/reports",
+    "reportType": "full"
+  },
+  "tempDirName": ".stryker-tmp",
+  "packageManager": "npm",
+  "tsconfigFile": "tsconfig.json",
+  "mochaOptions": {
+    "files": [
+      "test/**/*.test.ts"
+    ]
+  },
+  "configFile": "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js"
+}
+16:35:23 (53233) DEBUG PluginLoader Loading @stryker-mutator/* from /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator
+16:35:23 (53233) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner" (matched with expression @stryker-mutator/*)
+16:35:23 (53233) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript" (matched with expression @stryker-mutator/*)
+16:35:23 (53233) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner
+16:35:23 (53233) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript
+16:35:23 (53233) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/reporters/index.js
+16:35:23 (53233) DEBUG MochaOptionsLoader Mocha >= 6 detected. Using mocha's `loadOptions` to load mocha options
+16:35:23 (53233) TRACE MochaOptionsLoader Mocha: loadOptions(['--files','test/**/*.test.ts']) => {"_":[],"diff":true,"files":"test/**/*.test.ts","config":false,"package":false,"opts":false,"require":["./node_modules/ts-node/register","./node_modules/source-map-support/register"],"r":["./node_modules/ts-node/register","./node_modules/source-map-support/register"],"recursive":true,"extension":["js","cjs","mjs"],"reporter":"spec","R":"spec","slow":75,"s":75,"timeout":2000,"t":2000,"timeouts":2000,"ui":"bdd","u":"bdd","watch-ignore":["node_modules",".git"]}
+16:35:23 (53233) DEBUG MochaOptionsLoader Loaded options: {
+  "require": [
+    "./node_modules/ts-node/register",
+    "./node_modules/source-map-support/register"
+  ],
+  "extension": [
+    "js",
+    "cjs",
+    "mjs"
+  ],
+  "timeout": 2000,
+  "ui": "bdd"
+}
+16:35:23 (53233) INFO TypescriptConfigEditor Loading tsconfig file /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tsconfig.json
+16:35:23 (53233) INFO InputFileResolver Found 4 of 21 file(s) to be mutated.
+16:35:23 (53233) DEBUG InputFileResolver All input files: [
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.mocharc.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.log",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.gitignore",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.nycrc",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.travis.yml",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/HISTORY.md",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/LICENSE",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/NOTICE",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/README.md",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/package-lock.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/package.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/ABI.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/VcStatusRegistry.sol",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/index.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/interfaces.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/transaction-count.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/vc-status-registry.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/test/vc-status-registry.test.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tsconfig.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tslint.json"
+]
+16:35:23 (53233) DEBUG InputFileResolver Files to mutate: [
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/index.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/interfaces.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/transaction-count.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/vc-status-registry.ts"
+]
+16:35:23 (53233) DEBUG TemporaryDirectory Using temp directory "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp"
+16:35:23 (53233) DEBUG TestFrameworkOrchestrator The `coverageAnalysis` setting is "off", not hooking into the test framework to achieve performance benefits.
+16:35:23 (53233) INFO InitialTestExecutor Starting initial test run. This may take a while.
+16:35:23 (53233) DEBUG Sandbox Creating a sandbox for files in /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp/sandbox8943941
+16:35:24 (53233) DEBUG Sandbox Creating test runner 0
+16:35:24 (53233) DEBUG ChildProcessProxy Starting /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/test-runner/ChildProcessTestRunnerWorker.js in child process 53236
+16:35:24 (53236) DEBUG ChildProcessProxyWorker Changing current working directory for this process to /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp/sandbox8943941
+16:35:24 (53236) DEBUG PluginLoader Loading @stryker-mutator/* from /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator
+16:35:24 (53236) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner" (matched with expression @stryker-mutator/*)
+16:35:24 (53236) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript" (matched with expression @stryker-mutator/*)
+16:35:24 (53236) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner
+16:35:24 (53236) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript
+16:35:24 (53236) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/reporters/index.js
+16:35:24 (53236) DEBUG MochaTestRunner Mocha >= 6 detected. Using mocha's `handleFiles` to load files
+16:35:24 (53233) TRACE ChildProcessProxy [31mError: No test files found[39m
+
+16:35:24 (53233) DEBUG TimeoutDecorator Starting timeout timer (300000 ms) for a test run
+16:35:24 (53236) DEBUG MochaTestRunner Starting Mocha test run
+16:35:24 (53236) DEBUG MochaTestRunner Mocha test run completed: 0/0 passed
+16:35:24 (53233) DEBUG ChildProcessProxy Disposing of worker process 53236
+16:35:24 (53233) DEBUG ChildProcessProxy Kill 53236
+16:35:24 (53233) WARN InitialTestExecutor No tests were executed. Stryker will exit prematurely. Please check your configuration.
+16:35:24 (53233) INFO MutatorFacade 85 Mutant(s) generated
+17:15:27 (55051) INFO ConfigReader Using stryker.conf.js
+17:15:27 (55051) DEBUG BroadcastReporter Broadcasting to reporters ["html","clear-text","progress"]
+17:15:27 (55051) DEBUG ConfigReader Loading config /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js
+17:15:27 (55051) DEBUG ConfigReader Loaded config: {
+  "mutate": [
+    "src/**/*.ts"
+  ],
+  "logLevel": "debug",
+  "fileLogLevel": "trace",
+  "timeoutMS": 5000,
+  "timeoutFactor": 1.5,
+  "plugins": [
+    "@stryker-mutator/*"
+  ],
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress"
+  ],
+  "coverageAnalysis": "off",
+  "testRunner": "mocha",
+  "mutator": "typescript",
+  "transpilers": [],
+  "maxConcurrentTestRunners": null,
+  "symlinkNodeModules": true,
+  "thresholds": {
+    "high": 100,
+    "low": 90,
+    "break": 80
+  },
+  "allowConsoleColors": true,
+  "dashboard": {
+    "baseUrl": "https://dashboard.stryker-mutator.io/api/reports",
+    "reportType": "full"
+  },
+  "tempDirName": ".stryker-tmp",
+  "config": "path/to/mocha/config/.mocharc.json",
+  "packageManager": "npm",
+  "tsconfigFile": "tsconfig.json",
+  "mochaOptions": {
+    "files": [
+      "test/**/*.test.ts"
+    ]
+  },
+  "configFile": "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js"
+}
+17:15:27 (55051) DEBUG PluginLoader Loading @stryker-mutator/* from /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator
+17:15:27 (55051) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner" (matched with expression @stryker-mutator/*)
+17:15:27 (55051) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript" (matched with expression @stryker-mutator/*)
+17:15:27 (55051) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner
+17:15:27 (55051) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript
+17:15:27 (55051) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/reporters/index.js
+17:15:27 (55051) DEBUG MochaOptionsLoader Mocha >= 6 detected. Using mocha's `loadOptions` to load mocha options
+17:15:27 (55051) TRACE MochaOptionsLoader Mocha: loadOptions(['--files','test/**/*.test.ts']) => {"_":[],"diff":true,"files":"test/**/*.test.ts","config":false,"package":false,"opts":false,"require":["./node_modules/ts-node/register","./node_modules/source-map-support/register"],"r":["./node_modules/ts-node/register","./node_modules/source-map-support/register"],"recursive":true,"extension":["js","cjs","mjs"],"reporter":"spec","R":"spec","slow":75,"s":75,"timeout":2000,"t":2000,"timeouts":2000,"ui":"bdd","u":"bdd","watch-ignore":["node_modules",".git"]}
+17:15:27 (55051) DEBUG MochaOptionsLoader Loaded options: {
+  "require": [
+    "./node_modules/ts-node/register",
+    "./node_modules/source-map-support/register"
+  ],
+  "extension": [
+    "js",
+    "cjs",
+    "mjs"
+  ],
+  "timeout": 2000,
+  "ui": "bdd"
+}
+17:15:27 (55051) INFO TypescriptConfigEditor Loading tsconfig file /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tsconfig.json
+17:15:27 (55051) INFO InputFileResolver Found 4 of 21 file(s) to be mutated.
+17:15:27 (55051) DEBUG InputFileResolver All input files: [
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.mocharc.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.log",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.gitignore",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.nycrc",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.travis.yml",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/HISTORY.md",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/LICENSE",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/NOTICE",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/README.md",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/package-lock.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/package.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/ABI.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/VcStatusRegistry.sol",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/index.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/interfaces.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/transaction-count.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/vc-status-registry.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/test/vc-status-registry.test.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tsconfig.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tslint.json"
+]
+17:15:27 (55051) DEBUG InputFileResolver Files to mutate: [
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/index.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/interfaces.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/transaction-count.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/vc-status-registry.ts"
+]
+17:15:27 (55051) DEBUG TemporaryDirectory Using temp directory "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp"
+17:15:27 (55051) DEBUG TestFrameworkOrchestrator The `coverageAnalysis` setting is "off", not hooking into the test framework to achieve performance benefits.
+17:15:27 (55051) INFO InitialTestExecutor Starting initial test run. This may take a while.
+17:15:27 (55051) DEBUG Sandbox Creating a sandbox for files in /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp/sandbox3509240
+17:15:27 (55051) DEBUG Sandbox Creating test runner 0
+17:15:27 (55051) DEBUG ChildProcessProxy Starting /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/test-runner/ChildProcessTestRunnerWorker.js in child process 55054
+17:15:27 (55054) DEBUG ChildProcessProxyWorker Changing current working directory for this process to /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp/sandbox3509240
+17:15:27 (55054) DEBUG PluginLoader Loading @stryker-mutator/* from /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator
+17:15:27 (55054) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner" (matched with expression @stryker-mutator/*)
+17:15:27 (55054) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript" (matched with expression @stryker-mutator/*)
+17:15:27 (55054) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner
+17:15:27 (55054) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript
+17:15:28 (55054) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/reporters/index.js
+17:15:28 (55054) DEBUG MochaTestRunner Mocha >= 6 detected. Using mocha's `handleFiles` to load files
+17:15:28 (55051) TRACE ChildProcessProxy [31mError: No test files found[39m
+
+17:15:28 (55051) DEBUG TimeoutDecorator Starting timeout timer (300000 ms) for a test run
+17:15:28 (55054) DEBUG MochaTestRunner Starting Mocha test run
+17:15:28 (55054) DEBUG MochaTestRunner Mocha test run completed: 0/0 passed
+17:15:28 (55051) DEBUG ChildProcessProxy Disposing of worker process 55054
+17:15:28 (55051) DEBUG ChildProcessProxy Kill 55054
+17:15:28 (55051) WARN InitialTestExecutor No tests were executed. Stryker will exit prematurely. Please check your configuration.
+17:15:28 (55051) INFO MutatorFacade 85 Mutant(s) generated
+17:16:17 (55216) INFO ConfigReader Using stryker.conf.js
+17:16:17 (55216) DEBUG BroadcastReporter Broadcasting to reporters ["html","clear-text","progress"]
+17:16:17 (55216) DEBUG ConfigReader Loading config /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js
+17:16:17 (55216) DEBUG ConfigReader Loaded config: {
+  "mutate": [
+    "src/**/*.ts"
+  ],
+  "logLevel": "debug",
+  "fileLogLevel": "trace",
+  "timeoutMS": 5000,
+  "timeoutFactor": 1.5,
+  "plugins": [
+    "@stryker-mutator/*"
+  ],
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress"
+  ],
+  "coverageAnalysis": "off",
+  "testRunner": "mocha",
+  "mutator": "typescript",
+  "transpilers": [],
+  "maxConcurrentTestRunners": null,
+  "symlinkNodeModules": true,
+  "thresholds": {
+    "high": 100,
+    "low": 90,
+    "break": 80
+  },
+  "allowConsoleColors": true,
+  "dashboard": {
+    "baseUrl": "https://dashboard.stryker-mutator.io/api/reports",
+    "reportType": "full"
+  },
+  "tempDirName": ".stryker-tmp",
+  "config": "./.mocharc.json",
+  "packageManager": "npm",
+  "tsconfigFile": "tsconfig.json",
+  "mochaOptions": {
+    "files": [
+      "test/**/*.test.ts"
+    ]
+  },
+  "configFile": "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js"
+}
+17:16:17 (55216) DEBUG PluginLoader Loading @stryker-mutator/* from /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator
+17:16:17 (55216) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner" (matched with expression @stryker-mutator/*)
+17:16:17 (55216) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript" (matched with expression @stryker-mutator/*)
+17:16:17 (55216) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner
+17:16:17 (55216) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript
+17:16:17 (55216) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/reporters/index.js
+17:16:17 (55216) DEBUG MochaOptionsLoader Mocha >= 6 detected. Using mocha's `loadOptions` to load mocha options
+17:16:17 (55216) TRACE MochaOptionsLoader Mocha: loadOptions(['--files','test/**/*.test.ts']) => {"_":[],"diff":true,"files":"test/**/*.test.ts","config":false,"package":false,"opts":false,"require":["./node_modules/ts-node/register","./node_modules/source-map-support/register"],"r":["./node_modules/ts-node/register","./node_modules/source-map-support/register"],"recursive":true,"extension":["js","cjs","mjs"],"reporter":"spec","R":"spec","slow":75,"s":75,"timeout":2000,"t":2000,"timeouts":2000,"ui":"bdd","u":"bdd","watch-ignore":["node_modules",".git"]}
+17:16:17 (55216) DEBUG MochaOptionsLoader Loaded options: {
+  "require": [
+    "./node_modules/ts-node/register",
+    "./node_modules/source-map-support/register"
+  ],
+  "extension": [
+    "js",
+    "cjs",
+    "mjs"
+  ],
+  "timeout": 2000,
+  "ui": "bdd"
+}
+17:16:17 (55216) INFO TypescriptConfigEditor Loading tsconfig file /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tsconfig.json
+17:16:17 (55216) INFO InputFileResolver Found 4 of 21 file(s) to be mutated.
+17:16:17 (55216) DEBUG InputFileResolver All input files: [
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.mocharc.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.log",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.gitignore",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.nycrc",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.travis.yml",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/HISTORY.md",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/LICENSE",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/NOTICE",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/README.md",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/package-lock.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/package.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/ABI.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/VcStatusRegistry.sol",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/index.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/interfaces.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/transaction-count.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/vc-status-registry.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/stryker.conf.js",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/test/vc-status-registry.test.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tsconfig.json",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/tslint.json"
+]
+17:16:18 (55216) DEBUG InputFileResolver Files to mutate: [
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/index.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/interfaces.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/transaction-count.ts",
+  "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/src/vc-status-registry.ts"
+]
+17:16:18 (55216) DEBUG TemporaryDirectory Using temp directory "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp"
+17:16:18 (55216) DEBUG TestFrameworkOrchestrator The `coverageAnalysis` setting is "off", not hooking into the test framework to achieve performance benefits.
+17:16:18 (55216) INFO InitialTestExecutor Starting initial test run. This may take a while.
+17:16:18 (55216) DEBUG Sandbox Creating a sandbox for files in /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp/sandbox2963288
+17:16:18 (55216) DEBUG Sandbox Creating test runner 0
+17:16:18 (55216) DEBUG ChildProcessProxy Starting /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/test-runner/ChildProcessTestRunnerWorker.js in child process 55219
+17:16:18 (55219) DEBUG ChildProcessProxyWorker Changing current working directory for this process to /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/.stryker-tmp/sandbox2963288
+17:16:18 (55219) DEBUG PluginLoader Loading @stryker-mutator/* from /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator
+17:16:18 (55219) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner" (matched with expression @stryker-mutator/*)
+17:16:18 (55219) DEBUG PluginLoader Loading plugin "/Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript" (matched with expression @stryker-mutator/*)
+17:16:18 (55219) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/mocha-runner
+17:16:18 (55219) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/typescript
+17:16:18 (55219) DEBUG PluginLoader Loading plugins /Users/jarl/Projects/SSI/github/rabobank-blockchain/vc-status-registry/node_modules/@stryker-mutator/core/src/reporters/index.js
+17:16:18 (55219) DEBUG MochaTestRunner Mocha >= 6 detected. Using mocha's `handleFiles` to load files
+17:16:18 (55216) TRACE ChildProcessProxy [31mError: No test files found[39m
+
+17:16:18 (55216) DEBUG TimeoutDecorator Starting timeout timer (300000 ms) for a test run
+17:16:18 (55219) DEBUG MochaTestRunner Starting Mocha test run
+17:16:18 (55219) DEBUG MochaTestRunner Mocha test run completed: 0/0 passed
+17:16:18 (55216) DEBUG ChildProcessProxy Disposing of worker process 55219
+17:16:18 (55216) DEBUG ChildProcessProxy Kill 55219
+17:16:18 (55216) WARN InitialTestExecutor No tests were executed. Stryker will exit prematurely. Please check your configuration.
+17:16:18 (55216) INFO MutatorFacade 85 Mutant(s) generated

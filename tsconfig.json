@@ -5,15 +5,16 @@
     "moduleResolution": "node",
     "removeComments": false,
     "sourceMap": true,
+    "experimentalDecorators": true,
     "declaration": true,
     "baseUrl": "types",
     "typeRoots": ["node_modules/@types"],
     "target": "es6",
-    "lib": ["es2016", "dom"],
-    "rootDir": "src",
+    "lib": ["es6", "dom"],
+    "rootDirs": ["src", "test"],
     "outDir": "dist",
     "types": [
-      "mocha"
+      "mocha", "node"
     ]
   },
   "include": [
