@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PastEventType = void 0;
 var PastEventType;
 (function (PastEventType) {
     PastEventType[PastEventType["set"] = 0] = "set";

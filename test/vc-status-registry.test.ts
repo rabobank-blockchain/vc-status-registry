@@ -248,7 +248,7 @@ describe('Test vcStatusRegistry functionality', () => {
       txNonceMaxIdleTime: 30000
     }
 
-    const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
+    const wallet = new Wallet(Buffer.from(privateKey, 'hex'), vcStatusRegistry.provider)
     const transactionCount = new TransactionCount(wallet, options)
 
     const stubTransactionCount = sinon
@@ -271,7 +271,7 @@ describe('Test vcStatusRegistry functionality', () => {
       txNonceMaxIdleTime: 30000
     }
 
-    const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
+    const wallet = new Wallet(Buffer.from(privateKey, 'hex'), vcStatusRegistry.provider)
     const transactionCount = new TransactionCount(wallet, options)
 
     const stubTransactionCount = sinon
@@ -294,7 +294,7 @@ describe('Test vcStatusRegistry functionality', () => {
       txNonceMaxIdleTime: 0
     }
 
-    const wallet = new Wallet(privateKey, vcStatusRegistry.provider)
+    const wallet = new Wallet(Buffer.from(privateKey, 'hex'), vcStatusRegistry.provider)
     const transactionCount = new TransactionCount(wallet, options)
 
     const stubTransactionCount = sinon

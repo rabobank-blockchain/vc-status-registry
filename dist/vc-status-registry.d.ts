@@ -21,15 +21,15 @@ export declare class VcStatusRegistry {
      * @param _options optional, see VcStatusRegistryOptions
      */
     constructor(_ethereumProvider: string, _contractAddress: string, privateKey?: string, _options?: VcStatusRegistryOptions);
-    readonly ethereumProvider: string;
-    readonly contractAddress: string;
-    readonly provider: providers.JsonRpcProvider;
-    readonly wallet: Wallet | undefined;
-    readonly ABI: object;
-    readonly onNewBlock: Observable<NewBlockData>;
-    readonly onSetVcStatus: Observable<ContractEventData>;
-    readonly onRemoveVcStatus: Observable<ContractEventData>;
-    readonly onError: Observable<any>;
+    get ethereumProvider(): string;
+    get contractAddress(): string;
+    get provider(): providers.JsonRpcProvider;
+    get wallet(): Wallet | undefined;
+    get ABI(): object;
+    get onNewBlock(): Observable<NewBlockData>;
+    get onSetVcStatus(): Observable<ContractEventData>;
+    get onRemoveVcStatus(): Observable<ContractEventData>;
+    get onError(): Observable<any>;
     setVcStatus: (credentialId: string, value?: boolean) => Promise<string>;
     getVcStatus: (issuer: string, credentialId: string) => Promise<string>;
     private _contractMethod;
