@@ -43,7 +43,7 @@
     "url": "https://github.com/rabobank-blockchain/vc-status-registry/issues"
   },
   "dependencies": {
-    "ethers": "^5.0.3",
+    "ethers": "^5.0.4",
     "rxjs": "^6.6.0"
   },
   "devDependencies": {
