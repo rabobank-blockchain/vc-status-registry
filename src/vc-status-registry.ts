@@ -103,7 +103,7 @@ export class VcStatusRegistry {
       gasLimit: this._options.gasLimit
     }
     const txResponse = await this._contractMethod(method, [credentialId], overrides)
-    return txResponse.hash as string
+    return txResponse.hash
   }
 
   public getVcStatus = async (issuer: string, credentialId: string): Promise<string> => {

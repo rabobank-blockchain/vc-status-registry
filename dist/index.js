@@ -16,9 +16,9 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var vc_status_registry_1 = require("./vc-status-registry");
-exports.VcStatusRegistry = vc_status_registry_1.VcStatusRegistry;
+Object.defineProperty(exports, "VcStatusRegistry", { enumerable: true, get: function () { return vc_status_registry_1.VcStatusRegistry; } });
 var transaction_count_1 = require("./transaction-count");
-exports.TransactionCount = transaction_count_1.TransactionCount;
+Object.defineProperty(exports, "TransactionCount", { enumerable: true, get: function () { return transaction_count_1.TransactionCount; } });
 var interfaces_1 = require("./interfaces");
-exports.PastEventType = interfaces_1.PastEventType;
+Object.defineProperty(exports, "PastEventType", { enumerable: true, get: function () { return interfaces_1.PastEventType; } });
 //# sourceMappingURL=index.js.map
