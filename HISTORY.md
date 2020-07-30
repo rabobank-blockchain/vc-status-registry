@@ -1,8 +1,8 @@
 # 0.2.2 / 30-07-2020
 
 **Enhancements:**
-- Dependency patch updates
- - ethers.js: 5.0.4 to 5.0.5
+- Dependency patch updates:
+  - ethers.js: 5.0.4 to 5.0.5
 
 # 0.2.1 / 24-07-2020
 
