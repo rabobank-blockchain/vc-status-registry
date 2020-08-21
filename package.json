@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "ethers": "^5.0.5",
-    "rxjs": "^6.6.0"
+    "rxjs": "^6.6.2"
   },
   "devDependencies": {
     "@stryker-mutator/core": "^2.5.0",
